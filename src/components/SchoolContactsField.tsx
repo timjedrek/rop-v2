@@ -2,23 +2,23 @@
 
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
+import type { ContactPerson } from "@/lib/types";
 
-type Contact = {
-  name: string;
-  title: string;
-  phone: string;
-  email: string;
-};
-
-const emptyContact = (): Contact => ({ name: "", title: "", phone: "", email: "" });
+const emptyContact = (): ContactPerson => ({ name: "", title: "", phone: "", email: "" });
 
 const inputClass =
   "w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600";
 
-export function SchoolContactsField() {
-  const [contacts, setContacts] = useState<Contact[]>([emptyContact()]);
+type Props = {
+  initialContacts?: ContactPerson[];
+};
 
-  const update = (index: number, field: keyof Contact, value: string) =>
+export function SchoolContactsField({ initialContacts }: Props) {
+  const [contacts, setContacts] = useState<ContactPerson[]>(
+    initialContacts && initialContacts.length > 0 ? initialContacts : [emptyContact()]
+  );
+
+  const update = (index: number, field: keyof ContactPerson, value: string) =>
     setContacts((prev) =>
       prev.map((c, i) => (i === index ? { ...c, [field]: value } : c))
     );
