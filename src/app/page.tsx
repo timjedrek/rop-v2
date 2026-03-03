@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SchoolCard } from "@/components/SchoolCard";
-import { getFeaturedSchools, getCityBySlug, getStateBySlug } from "@/lib/mock-data";
+import { getFeaturedSchools, getCityBySlug, getStateBySlug, programs } from "@/lib/mock-data";
 import { schoolHref } from "@/lib/utils";
 import { HeroSearch } from "@/components/HeroSearch";
 
@@ -139,10 +139,53 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Common Flight School Offerings */}
+      <section className="bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-blue-800 dark:text-blue-400">
+            Common Flight School Offerings
+          </h2>
+          <p className="text-center text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-12 text-lg">
+            Most flight schools offer some combination of these certifications and ratings.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {["private-pilot", "instrument-rating", "commercial-pilot", "cfi"]
+              .map((slug) => programs.find((p) => p.slug === slug)!)
+              .map((program) => (
+              <Link
+                key={program.id}
+                href={`/programs/${program.slug}`}
+                className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                    {program.shortName}
+                  </h3>
+                  {program.minimumHours && (
+                    <span className="text-xs font-semibold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-slate-700 px-2 py-1 rounded whitespace-nowrap ml-2">
+                      {program.minimumHours}+ hrs
+                    </span>
+                  )}
+                </div>
+                {program.typicalDuration && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{program.typicalDuration}</p>
+                )}
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">
+                  {program.description}
+                </p>
+                <span className="mt-4 inline-block text-sm font-semibold text-blue-700 dark:text-blue-400 group-hover:underline">
+                  Learn more →
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Update or Add Flight School */}
       <section className="bg-slate-50 dark:bg-slate-900 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-blue-800 dark:text-blue-400">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-rose-800 dark:text-rose-700">
         Looking to Update or Add Your Flight School?
           </h2>
           <div className="max-w-3xl mx-auto bg-white dark:bg-slate-800 rounded-lg shadow-md p-8 space-y-6 text-slate-700 dark:text-slate-300 ">
@@ -153,9 +196,9 @@ export default function Home() {
           After submission, our team will review your listing to ensure all information is accurate and complete. Once approved, your flight school will be published on our platform, making it visible to potential students searching for flight training in your area.
         </p>
         <div className="text-center pt-4">
-          <button className="px-6 py-3 bg-blue-700 text-white font-semibold rounded-md hover:bg-blue-800 transition">
+          <Link href="/signup" className="inline-block px-6 py-3 bg-rose-800 text-white font-semibold rounded-md hover:bg-rose-700 transition">
             Create Account
-          </button>
+          </Link>
         </div>
           </div>
         </div>
@@ -163,7 +206,7 @@ export default function Home() {
 
       {/* Looking for Something Different */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-rose-800 dark:text-rose-700">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-blue-800 dark:text-blue-400">
           Looking for Something Different?
         </h2>
         <div className="max-w-3xl mx-auto bg-white dark:bg-slate-900 rounded-lg shadow-md p-8 space-y-6 text-slate-700 dark:text-slate-300">
@@ -174,7 +217,7 @@ export default function Home() {
         Private instruction offers more flexibility in scheduling, one-on-one attention, and potentially a more tailored learning experience that fits your specific needs and learning style.
           </p>
           <div className="text-center pt-4">
-        <button className="bg-rose-800 text-white px-4 py-3 rounded hover:bg-rose-700 transition">
+        <button className="bg-blue-700 text-white px-4 py-3 rounded hover:bg-blue-800 transition">
           Connect with Private CFIs
         </button>
           </div>
