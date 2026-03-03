@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Plane, ChevronRight } from "lucide-react";
 import { trainerAircraft } from "@/lib/mock-data";
 import type { AircraftCategory } from "@/lib/types";
+import { Suspense } from "react";
+import AircraftFilterBar from "@/components/AircraftFilterBar";
 
 export const metadata: Metadata = {
   title: "Trainer Aircraft – Common Flight Training Aircraft",
@@ -44,7 +46,18 @@ const grouped = categoryOrder
   }))
   .filter((g) => g.aircraft.length > 0);
 
-export default function AircraftPage() {
+export default async function AircraftPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  const { category } = await searchParams;
+  const activeCategory = category as AircraftCategory | undefined;
+
+  const visibleGroups = activeCategory
+    ? grouped.filter((g) => g.category === activeCategory)
+    : grouped;
+
   return (
     <div className="pb-20">
       {/* Hero */}
@@ -64,9 +77,16 @@ export default function AircraftPage() {
         </div>
       </section>
 
+      {/* Filter bar */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <Suspense>
+          <AircraftFilterBar />
+        </Suspense>
+      </div>
+
       {/* Aircraft grouped by category */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-        {grouped.map(({ category, label, aircraft }) => (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+        {visibleGroups.map(({ category, label, aircraft }) => (
           <section key={category}>
             <h2 className="text-lg font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest text-xs mb-4">
               {label}
