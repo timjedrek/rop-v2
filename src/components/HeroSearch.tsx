@@ -176,7 +176,8 @@ export function HeroSearch({ initialQuery = "" }: { initialQuery?: string }) {
                     <Plane className="w-4 h-4 text-blue-500 flex-shrink-0" />
                     <div className="min-w-0">
                       <p className="font-semibold text-slate-800 dark:text-slate-100 truncate">
-                        <span className="text-blue-700 dark:text-blue-400 mr-1">{result.code}</span>
+                        <span className="text-blue-700 dark:text-blue-400">{result.code}</span>
+                        <span className="text-slate-400 mx-1">&nbsp;</span>
                         {result.name}
                       </p>
                       <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
