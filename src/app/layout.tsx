@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,34 +22,37 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        {/* Temporary simple navbar – we'll style/improve it next */}
-        <header className="bg-white border-b sticky top-0 z-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              <div className="text-2xl font-bold text-rose-800">
-                Flight School Finder
+        <ThemeProvider>
+          {/* Temporary simple navbar – we'll style/improve it next */}
+          <header className="bg-white dark:bg-slate-900 border-b dark:border-slate-700 sticky top-0 z-10">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-between items-center h-16">
+                <div className="text-2xl font-bold text-rose-800 dark:text-rose-400">
+                  Flight School Finder
+                </div>
+                <nav className="flex items-center space-x-6 text-sm font-medium">
+                  <a href="#" className="text-slate-700 dark:text-slate-300 hover:text-rose-900 dark:hover:text-rose-400">Featured</a>
+                  <a href="#" className="text-slate-700 dark:text-slate-300 hover:text-rose-900 dark:hover:text-rose-400">Top Rated</a>
+                  <a href="#" className="text-slate-700 dark:text-slate-300 hover:text-rose-900 dark:hover:text-rose-400">Browse</a>
+                  <button className="bg-rose-800 text-white px-4 py-2 rounded hover:bg-rose-700">Login</button>
+                  <ThemeToggle />
+                </nav>
               </div>
-              <nav className="space-x-6 text-sm font-medium">
-                <a href="#" className="text-slate-700 hover:text-rose-900">Featured</a>
-                <a href="#" className="text-slate-700 hover:text-rose-900">Top Rated</a>
-                <a href="#" className="text-slate-700 hover:text-rose-900">Browse</a>
-                <button className="bg-rose-800 text-white px-4 py-2 rounded hover:bg-rose-700">Login</button>
-              </nav>
             </div>
-          </div>
-        </header>
+          </header>
 
-        {/* Where the actual page content goes */}
-        <main className="min-h-screen bg-slate-100">
-          {children}
-        </main>
+          {/* Where the actual page content goes */}
+          <main className="min-h-screen bg-slate-100 dark:bg-slate-950">
+            {children}
+          </main>
 
-        {/* Minimal footer */}
-        <footer className="bg-slate-800 text-slate-300 py-6 text-center text-sm">
-          <p>Flight School Finder © {new Date().getFullYear()} - A coding project by Tim Jedrek</p>
-        </footer>
+          {/* Minimal footer */}
+          <footer className="bg-slate-800 dark:bg-slate-900 text-slate-300 py-6 text-center text-sm">
+            <p>Flight School Finder © {new Date().getFullYear()} - A coding project by Tim Jedrek</p>
+          </footer>
+        </ThemeProvider>
       </body>
     </html>
   );
