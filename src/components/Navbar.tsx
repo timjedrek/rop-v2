@@ -61,9 +61,9 @@ export function Navbar() {
                 </a>
               )
             )}
-            <button className="bg-rose-800 text-white px-4 py-2 rounded hover:bg-rose-700">
+            <Link href="/login" className="bg-rose-800 text-white px-4 py-2 rounded hover:bg-rose-700">
               Login
-            </button>
+            </Link>
             <ThemeToggle />
           </nav>
 
