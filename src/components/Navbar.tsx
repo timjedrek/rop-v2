@@ -21,9 +21,9 @@ export function Navbar() {
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
-          <div className="text-2xl font-bold text-rose-800 dark:text-rose-700">
+            <a href="/" className="text-2xl font-bold text-rose-800 dark:text-rose-700">
             Flight School Finder
-          </div>
+            </a>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
