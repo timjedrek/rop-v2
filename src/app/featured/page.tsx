@@ -21,7 +21,7 @@ export default function FeaturedSchoolsPage() {
             Featured Flight Schools
           </h1>
           <p className="text-xl opacity-90 max-w-2xl mx-auto">
-            Hand-picked top-rated schools across the USA — great programs, proven instructors, and strong student reviews.
+            Featured schools that have a great reputation for flight training with programs for Private Pilot, Instrument, Commercial, CFI, and ATP.
           </p>
         </div>
       </section>

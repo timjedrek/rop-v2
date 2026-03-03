@@ -10,7 +10,7 @@ export type NavLink =
 
 export const navLinks: NavLink[] = [
   { label: "Featured", href: "/featured" },
-  { label: "Top Rated", href: "#" },
+  { label: "Top Rated", href: "/top-rated" },
   {
     label: "Browse",
     children: [

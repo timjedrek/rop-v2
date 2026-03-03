@@ -380,6 +380,16 @@ export function getFeaturedSchools(): FlightSchool[] {
   return flightSchools.filter((s) => s.featured);
 }
 
+/**
+ * Returns all schools sorted by a weighted score that factors in both
+ * rating and review count: score = rating × log(reviewCount + 1)
+ * This rewards schools that are both highly rated AND well-reviewed.
+ */
+export function getTopRatedSchools(): FlightSchool[] {
+  const score = (s: FlightSchool) => s.rating * Math.log(s.reviewCount + 1);
+  return [...flightSchools].sort((a, b) => score(b) - score(a));
+}
+
 /** Returns all sibling listings for the same brand (excludes the given school itself) */
 export function getRelatedSchools(school: FlightSchool): FlightSchool[] {
   if (!school.organizationId) return [];
