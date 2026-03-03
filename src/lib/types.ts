@@ -28,6 +28,8 @@ export type Airport = {
   iata: string | null;
   /** FAA local identifier, e.g. "FFZ" */
   faaLid: string | null;
+  /** Short paragraph describing the airport for the detail page */
+  description?: string;
 };
 
 export type ContactPerson = {

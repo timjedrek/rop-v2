@@ -94,6 +94,18 @@ export default async function AirportDetailPage({ params }: Props) {
       </section>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-14">
+        {/* Airport description */}
+        {airport.description && (
+          <section>
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-3">
+              About {airport.name}
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+              {airport.description}
+            </p>
+          </section>
+        )}
+
         {/* Schools */}
         <section>
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-5">
