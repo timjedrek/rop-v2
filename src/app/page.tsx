@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SchoolCard } from "@/components/SchoolCard";
 import { getFeaturedSchools, getCityBySlug, getStateBySlug } from "@/lib/mock-data";
 import { schoolHref } from "@/lib/utils";
+import { HeroSearch } from "@/components/HeroSearch";
 
 export const metadata: Metadata = {
   title: "Flight School Finder – Find Pilot Training Schools Across the USA",
@@ -38,19 +39,7 @@ export default function Home() {
             Search by flight school name, city, airport, state
           </p>
 
-          {/* Fake search bar – we'll make it functional later */}
-          <div className="max-w-2xl mx-auto">
-            <div className="flex rounded-lg overflow-hidden shadow-xl bg-slate-500">
-              <input
-                type="text"
-                placeholder="e.g. Mesa AZ, KCPS, West County Flying Club..."
-                className="flex-1 px-6 py-5 text-lg text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-300"
-              />
-              <button className="bg-slate-800 px-10 py-5 text-white font-semibold hover:bg-rose-700 transition">
-                Search
-              </button>
-            </div>
-          </div>
+          <HeroSearch />
         </div>
       </section>
 
