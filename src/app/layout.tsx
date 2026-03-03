@@ -50,7 +50,17 @@ export default function RootLayout({
 
           {/* Minimal footer */}
           <footer className="bg-slate-800 dark:bg-slate-900 text-slate-300 py-6 text-center text-sm">
-            <p>Flight School Finder © {new Date().getFullYear()} - A coding project by Tim Jedrek</p>
+            <p>
+              Flight School Finder © {new Date().getFullYear()} - A coding project by{" "}
+              <a
+                href="https://timjedrek.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-rose-500 hover:underline"
+              >
+                Tim Jedrek
+              </a>
+            </p>
           </footer>
         </ThemeProvider>
       </body>
