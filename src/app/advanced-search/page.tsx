@@ -59,19 +59,6 @@ export default function AdvancedSearchPage() {
 
   return (
     <>
-      {/* Hero */}
-      {/* <section className="bg-gradient-to-r from-blue-950 to-slate-700 py-14 px-4">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
-            Advanced School Search
-          </h1>
-          <p className="text-blue-200 text-lg max-w-2xl">
-            Filter by state, airport, aircraft fleet, programs offered, and
-            training type to find the right flight school for your goals.
-          </p>
-        </div>
-      </section> */}
-
       <AdvancedSearchExplorer
         schools={schoolData}
         programs={programOptions}
