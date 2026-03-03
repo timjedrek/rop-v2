@@ -1,5 +1,3 @@
-// src/app/page.tsx  ← home page (/)
-
 export default function Home() {
   return (
     <div className="pb-20">
