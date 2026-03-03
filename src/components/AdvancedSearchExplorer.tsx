@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { MapPin, Star, SlidersHorizontal, X, ArrowUp, ArrowDown } from "lucide-react";
 
@@ -134,35 +135,85 @@ function TypeaheadFilter<T extends { slug: string }>({
 }
 
 export function AdvancedSearchExplorer({ schools, programs, aircraft, states, cities }: Props) {
-  // School name
-  const [query, setQuery] = useState("");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const isFirstRender = useRef(true);
 
-  // State typeahead
+  // ── Filter state — initialized from URL params ────────────────────────────
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
+
   const [stateQuery, setStateQuery] = useState("");
-  const [selectedStates, setSelectedStates] = useState<StateOption[]>([]);
+  const [selectedStates, setSelectedStates] = useState<StateOption[]>(() => {
+    const param = searchParams.get("state");
+    if (!param) return [];
+    return param.split(",").map((slug) => states.find((s) => s.slug === slug)!).filter(Boolean);
+  });
   const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
 
-  // City typeahead
   const [cityQuery, setCityQuery] = useState("");
-  const [selectedCities, setSelectedCities] = useState<CityOption[]>([]);
+  const [selectedCities, setSelectedCities] = useState<CityOption[]>(() => {
+    const param = searchParams.get("city");
+    if (!param) return [];
+    return param.split(",").map((slug) => cities.find((c) => c.slug === slug)!).filter(Boolean);
+  });
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
 
-  // Other filters
-  const [airportQuery, setAirportQuery] = useState("");
-  const [selectedPrograms, setSelectedPrograms] = useState<Set<string>>(new Set());
-  const [selectedAircraft, setSelectedAircraft] = useState<Set<string>>(new Set());
-  const [faaPart, setFaaPart] = useState<"any" | "61" | "141" | "both">("any");
-  const [minRating, setMinRating] = useState(0);
+  const [airportQuery, setAirportQuery] = useState(() => searchParams.get("airport") ?? "");
 
-  // Sort
-  const [sortBy, setSortBy] = useState<"name" | "rating">("rating");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [selectedPrograms, setSelectedPrograms] = useState<Set<string>>(() => {
+    const param = searchParams.get("program");
+    return param ? new Set(param.split(",")) : new Set();
+  });
 
-  // Pagination + mobile
+  const [selectedAircraft, setSelectedAircraft] = useState<Set<string>>(() => {
+    const param = searchParams.get("ac");
+    return param ? new Set(param.split(",")) : new Set();
+  });
+
+  const [faaPart, setFaaPart] = useState<"any" | "61" | "141" | "both">(() => {
+    const param = searchParams.get("part");
+    return param === "61" || param === "141" || param === "both" ? param : "any";
+  });
+
+  const [minRating, setMinRating] = useState(() => {
+    const param = searchParams.get("rating");
+    const n = param ? parseInt(param, 10) : 0;
+    return n >= 1 && n <= 5 ? n : 0;
+  });
+
+  const [sortBy, setSortBy] = useState<"name" | "rating">(() => {
+    return searchParams.get("sort") === "name" ? "name" : "rating";
+  });
+
+  const [sortDir, setSortDir] = useState<"asc" | "desc">(() => {
+    return searchParams.get("dir") === "asc" ? "asc" : "desc";
+  });
+
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const resetCount = () => setVisibleCount(PAGE_SIZE);
+
+  // ── Sync filter state → URL ───────────────────────────────────────────────
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const params = new URLSearchParams();
+    if (query) params.set("q", query);
+    if (selectedStates.length) params.set("state", selectedStates.map((s) => s.slug).join(","));
+    if (selectedCities.length) params.set("city", selectedCities.map((c) => c.slug).join(","));
+    if (airportQuery) params.set("airport", airportQuery);
+    if (faaPart !== "any") params.set("part", faaPart);
+    if (selectedPrograms.size) params.set("program", [...selectedPrograms].join(","));
+    if (selectedAircraft.size) params.set("ac", [...selectedAircraft].join(","));
+    if (minRating > 0) params.set("rating", String(minRating));
+    if (sortBy !== "rating") params.set("sort", sortBy);
+    if (sortDir !== "desc") params.set("dir", sortDir);
+    const qs = params.toString();
+    router.replace(qs ? `/search?${qs}` : "/search", { scroll: false });
+  }, [query, selectedStates, selectedCities, airportQuery, faaPart, selectedPrograms, selectedAircraft, minRating, sortBy, sortDir]);
 
   // ── State typeahead helpers ──────────────────────────────────────────────────
   const stateSuggestions = useMemo(() => {
@@ -611,7 +662,7 @@ export function AdvancedSearchExplorer({ schools, programs, aircraft, states, ci
                           </span>
                         )}
                         {(school.faaPart === "141" || school.faaPart === "both") && (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 font-medium">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300 font-medium">
                             Part 141
                           </span>
                         )}

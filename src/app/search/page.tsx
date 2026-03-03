@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { flightSchools, programs, trainerAircraft, states, cities } from "@/lib/mock-data";
 import { schoolHref, slugToTitle } from "@/lib/utils";
 import { AdvancedSearchExplorer } from "@/components/AdvancedSearchExplorer";
 
 export const metadata: Metadata = {
-  title: "Advanced School Search | Flight School Finder",
+  title: "Search Flight Schools | Flight School Finder",
   description:
     "Filter USA flight schools by state, airport code, aircraft fleet, programs offered, and FAA Part 61 or Part 141 certification to find the perfect fit for your training goals.",
   openGraph: {
-    title: "Advanced Flight School Search",
+    title: "Search Flight Schools",
     description:
       "Filter by state, airport, aircraft, programs, and training type to find your ideal flight school.",
   },
 };
 
-export default function AdvancedSearchPage() {
+export default function SearchPage() {
   const stateAbbrevMap = Object.fromEntries(
     states.map((s) => [s.slug, s.abbreviation])
   );
@@ -58,7 +59,7 @@ export default function AdvancedSearchPage() {
     }));
 
   return (
-    <>
+    <Suspense>
       <AdvancedSearchExplorer
         schools={schoolData}
         programs={programOptions}
@@ -66,6 +67,6 @@ export default function AdvancedSearchPage() {
         states={stateOptions}
         cities={cityOptions}
       />
-    </>
+    </Suspense>
   );
 }

@@ -133,14 +133,6 @@ export function HeroSearch({ initialQuery = "" }: { initialQuery?: string }) {
           autoComplete="off"
           className="flex-1 px-6 py-5 text-lg text-slate-100 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-rose-300 bg-transparent"
         />
-        <button
-          type="button"
-          onClick={() => results.length > 0 && setOpen((o) => !o)}
-          className="bg-slate-800 px-10 py-5 text-white font-semibold hover:bg-rose-700 transition flex items-center gap-2"
-        >
-          <Search className="w-5 h-5" />
-          Search
-        </button>
       </div>
 
       {open && (
