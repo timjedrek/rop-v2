@@ -35,16 +35,19 @@ export function Navbar() {
                     {link.label}
                     <ChevronDown size={14} className="transition-transform group-hover:rotate-180" />
                   </button>
-                  <div className="absolute top-full left-0 mt-2 hidden group-hover:flex flex-col bg-white dark:bg-slate-900 border dark:border-slate-700 rounded-lg shadow-lg overflow-hidden min-w-40">
-                    {link.children.map((child) => (
-                      <a
-                        key={child.label}
-                        href={child.href}
-                        className="px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                      >
-                        {child.label}
-                      </a>
-                    ))}
+                  {/* Transparent bridge fills the gap so hover stays active */}
+                  <div className="absolute top-full left-0 hidden group-hover:block pt-2 min-w-40">
+                    <div className="bg-white dark:bg-slate-900 border dark:border-slate-700 rounded-lg shadow-lg overflow-hidden flex flex-col">
+                      {link.children.map((child) => (
+                        <a
+                          key={child.label}
+                          href={child.href}
+                          className="px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        >
+                          {child.label}
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ) : (
