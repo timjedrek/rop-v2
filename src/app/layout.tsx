@@ -53,12 +53,21 @@ export default function RootLayout({
             <p>
               Flight School Finder © {new Date().getFullYear()} - A coding project by{" "}
               <a
-                href="https://timjedrek.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-rose-500 hover:underline"
+              href="https://timjedrek.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-rose-500 hover:underline"
               >
-                Tim Jedrek
+              Tim Jedrek
+              </a>
+              {" "}and{" "}
+              <a
+              href="https://rightruddermarketing.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-rose-500 hover:underline"
+              >
+              Right Rudder Marketing
               </a>
             </p>
           </footer>
