@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { Navbar } from "@/components/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,23 +25,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider>
-          {/* Temporary simple navbar – we'll style/improve it next */}
-          <header className="bg-white dark:bg-slate-900 border-b dark:border-slate-700 sticky top-0 z-10">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center h-16">
-                <div className="text-2xl font-bold text-rose-800 dark:text-rose-700">
-                  Flight School Finder
-                </div>
-                <nav className="flex items-center space-x-6 text-sm font-medium">
-                  <a href="#" className="text-slate-700 dark:text-slate-300 hover:text-rose-900 dark:hover:text-rose-400">Featured</a>
-                  <a href="#" className="text-slate-700 dark:text-slate-300 hover:text-rose-900 dark:hover:text-rose-400">Top Rated</a>
-                  <a href="#" className="text-slate-700 dark:text-slate-300 hover:text-rose-900 dark:hover:text-rose-400">Browse</a>
-                  <button className="bg-rose-800 text-white px-4 py-2 rounded hover:bg-rose-700">Login</button>
-                  <ThemeToggle />
-                </nav>
-              </div>
-            </div>
-          </header>
+          <Navbar />
 
           {/* Where the actual page content goes */}
           <main className="min-h-screen bg-slate-100 dark:bg-slate-800">

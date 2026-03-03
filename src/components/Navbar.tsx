@@ -1,0 +1,110 @@
+"use client";
+
+import { useState } from "react";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { navLinks } from "@/lib/nav-links";
+
+export function Navbar() {
+  const [open, setOpen] = useState(false);
+
+  // Flatten nav links for mobile: top-level links stay as-is, children get promoted with mobileLabel
+  const mobileLinks = navLinks.flatMap((link) =>
+    link.children
+      ? link.children.map((child) => ({ label: child.mobileLabel, href: child.href }))
+      : [{ label: link.label, href: link.href as string }]
+  );
+
+  return (
+    <header className="bg-white dark:bg-slate-900 border-b dark:border-slate-700 sticky top-0 z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+
+          {/* Logo */}
+          <div className="text-2xl font-bold text-rose-800 dark:text-rose-700">
+            Flight School Finder
+          </div>
+
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+            {navLinks.map((link) =>
+              link.children ? (
+                // Dropdown item
+                <div key={link.label} className="relative group">
+                  <button className="flex items-center gap-1 text-slate-700 dark:text-slate-300 hover:text-rose-900 dark:hover:text-rose-400">
+                    {link.label}
+                    <ChevronDown size={14} className="transition-transform group-hover:rotate-180" />
+                  </button>
+                  <div className="absolute top-full left-0 mt-2 hidden group-hover:flex flex-col bg-white dark:bg-slate-900 border dark:border-slate-700 rounded-lg shadow-lg overflow-hidden min-w-40">
+                    {link.children.map((child) => (
+                      <a
+                        key={child.label}
+                        href={child.href}
+                        className="px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      >
+                        {child.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="text-slate-700 dark:text-slate-300 hover:text-rose-900 dark:hover:text-rose-400"
+                >
+                  {link.label}
+                </a>
+              )
+            )}
+            <button className="bg-rose-800 text-white px-4 py-2 rounded hover:bg-rose-700">
+              Login
+            </button>
+            <ThemeToggle />
+          </nav>
+
+          {/* Mobile: theme toggle + hamburger */}
+          <div className="flex md:hidden items-center gap-3">
+            <ThemeToggle />
+            <button
+              onClick={() => setOpen((prev) => !prev)}
+              aria-label="Toggle menu"
+              className="text-slate-700 dark:text-slate-300"
+            >
+              {open ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile dropdown — expands from top-right */}
+      <div
+        className={`
+          md:hidden absolute right-4 mt-1
+          bg-white dark:bg-slate-900 border dark:border-slate-700
+          rounded-lg shadow-lg overflow-hidden
+          origin-top-right transition-all duration-200
+          ${open ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}
+        `}
+      >
+        <nav className="flex flex-col py-2 min-w-44">
+          {mobileLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              onClick={() => setOpen(false)}
+              className="px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              {link.label}
+            </a>
+          ))}
+          <div className="px-5 py-3">
+            <button className="w-full bg-rose-800 text-white px-4 py-2 rounded hover:bg-rose-700 text-sm font-medium">
+              Login
+            </button>
+          </div>
+        </nav>
+      </div>
+    </header>
+  );
+}
