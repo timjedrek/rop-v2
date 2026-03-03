@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronLeft, Clock, CheckCircle, BookOpen, MapPin, Star } from "lucide-react";
+import { ChevronLeft, Clock, CheckCircle, BookOpen } from "lucide-react";
 import {
   programs,
   getProgramBySlug,
@@ -11,6 +11,8 @@ import {
   getStateBySlug,
   getAirportByCode,
 } from "@/lib/mock-data";
+import { SchoolsExplorer } from "@/components/SchoolsExplorer";
+import { schoolHref } from "@/lib/utils";
 
 type Props = { params: Promise<{ programSlug: string }> };
 
@@ -39,7 +41,21 @@ export default async function ProgramDetailPage({ params }: Props) {
   const program = getProgramBySlug(programSlug);
   if (!program) notFound();
 
-  const schools = getSchoolsByProgram(program.slug);
+  const rawSchools = getSchoolsByProgram(program.slug);
+  const schools = rawSchools.map((school) => {
+    const city = getCityBySlug(school.citySlug);
+    const state = getStateBySlug(school.stateSlug);
+    const airport = getAirportByCode(school.primaryAirportCode);
+    return {
+      id: school.id,
+      name: school.name,
+      href: schoolHref(school),
+      airportCode: school.primaryAirportCode,
+      airportName: airport?.name,
+      location: city && state ? `${city.name}, ${state.abbreviation}` : undefined,
+      rating: school.rating,
+    };
+  });
   const prereqs = (program.prerequisites ?? [])
     .map((slug) => getPrereqBySlug(slug))
     .filter(Boolean);
@@ -156,50 +172,10 @@ export default async function ProgramDetailPage({ params }: Props) {
         )}
 
         {/* Schools offering this program */}
-        <section>
-          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">
-            Schools Offering {program.shortName}
-          </h2>
-          {schools.length === 0 ? (
-            <p className="text-slate-500 dark:text-slate-400">No schools listed yet.</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {schools.map((school) => {
-                const city = getCityBySlug(school.citySlug);
-                const state = getStateBySlug(school.stateSlug);
-                const airport = getAirportByCode(school.primaryAirportCode);
-                return (
-                  <Link
-                    key={school.id}
-                    href={`/${school.stateSlug}/${school.citySlug}/${school.primaryAirportCode.toLowerCase()}/${school.slug}`}
-                    className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500 transition"
-                  >
-                    <p className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition mb-1">
-                      {school.name}
-                    </p>
-                    {airport && (
-                      <p className="font-mono text-sm text-blue-700 dark:text-blue-400">
-                        {school.primaryAirportCode} – {airport.name}
-                      </p>
-                    )}
-                    <div className="flex items-center justify-between mt-2">
-                      {city && state && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                          <MapPin size={12} />
-                          {city.name}, {state.abbreviation}
-                        </p>
-                      )}
-                      <div className="flex items-center gap-1 text-amber-500 text-sm">
-                        <Star size={13} fill="currentColor" />
-                        <span className="font-semibold">{school.rating.toFixed(1)}</span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </section>
+        <SchoolsExplorer
+          schools={schools}
+          heading={`Schools Offering ${program.shortName}`}
+        />
       </div>
     </div>
   );

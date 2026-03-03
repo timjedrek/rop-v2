@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Navbar } from "@/components/Navbar";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -68,12 +69,12 @@ export default function RootLayout({
               </a>
             </p>
             <div className="mt-3 flex justify-center gap-6">
-              <a href="/terms-of-service" className="text-slate-400 hover:text-slate-200 transition">
+              <Link href="/terms-of-service" className="text-slate-400 hover:text-slate-200 transition">
                 Terms of Service
-              </a>
-              <a href="/privacy-policy" className="text-slate-400 hover:text-slate-200 transition">
+              </Link>
+              <Link href="/privacy-policy" className="text-slate-400 hover:text-slate-200 transition">
                 Privacy Policy
-              </a>
+              </Link>
             </div>
           </footer>
         </ThemeProvider>

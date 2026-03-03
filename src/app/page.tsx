@@ -139,13 +139,13 @@ export default function Home() {
         Flight training begins with the <strong>Private Pilot License</strong>, which allows you to fly small aircraft in good weather conditions. This foundational certification is perfect for recreational flying and is the first step for anyone interested in aviation.
           </p>
           <p className="text-lg">
-        If you're looking to make a career out of flying, you'll need additional ratings and certificates, such as your Instrument Rating, Commercial Pilot License, and potentially Flight Instructor Certifications. Most airlines and good paying pilot jobs require <strong>1500 hours of flight time</strong>, and many pilots choose to become an instructor to gain the flight time needed to meet minimum requirements.
+        If you&apos;re looking to make a career out of flying, you&apos;ll need additional ratings and certificates, such as your Instrument Rating, Commercial Pilot License, and potentially Flight Instructor Certifications. Most airlines and good paying pilot jobs require <strong>1500 hours of flight time</strong>, and many pilots choose to become an instructor to gain the flight time needed to meet minimum requirements.
           </p>
           <p className="text-lg">
         Flight schools across the country offer programs to help you achieve these certifications and ratings, each with different approaches, aircraft fleets, and teaching methodologies.
           </p>
           <p className="text-lg">
-        We created <strong>Flight School Finder</strong> to help you navigate these options and find the best flight training program for your specific goals, budget, and location. Whether you're looking to fly for fun or pursuing a professional career, finding the right school is the first step toward your aviation journey.
+        We created <strong>Flight School Finder</strong> to help you navigate these options and find the best flight training program for your specific goals, budget, and location. Whether you&apos;re looking to fly for fun or pursuing a professional career, finding the right school is the first step toward your aviation journey.
           </p>
         </div>
       </section>
@@ -158,7 +158,7 @@ export default function Home() {
           </h2>
           <div className="max-w-3xl mx-auto bg-white dark:bg-slate-800 rounded-lg shadow-md p-8 space-y-6 text-slate-700 dark:text-slate-300 ">
         <p className="text-lg">
-          Adding your flight school to our directory is simple. Start by creating a user account through our sign-up process. Once registered, you'll have access to our submission form where you can provide details about your flight school, including location, aircraft fleet, certifications offered, and instructors.
+          Adding your flight school to our directory is simple. Start by creating a user account through our sign-up process. Once registered, you&apos;ll have access to our submission form where you can provide details about your flight school, including location, aircraft fleet, certifications offered, and instructors.
         </p>
         <p className="text-lg">
           After submission, our team will review your listing to ensure all information is accurate and complete. Once approved, your flight school will be published on our platform, making it visible to potential students searching for flight training in your area.
@@ -179,7 +179,7 @@ export default function Home() {
         </h2>
         <div className="max-w-3xl mx-auto bg-white dark:bg-slate-900 rounded-lg shadow-md p-8 space-y-6 text-slate-700 dark:text-slate-300">
           <p className="text-lg">
-        While flight schools offer structured programs for pilot certification, they might not be the right fit for everyone. If you're looking for a more personalized approach to flight training, connecting with private Certified Flight Instructors (CFIs) could be a better option for you.
+        While flight schools offer structured programs for pilot certification, they might not be the right fit for everyone. If you&apos;re looking for a more personalized approach to flight training, connecting with private Certified Flight Instructors (CFIs) could be a better option for you.
           </p>
           <p className="text-lg">
         Private instruction offers more flexibility in scheduling, one-on-one attention, and potentially a more tailored learning experience that fits your specific needs and learning style.

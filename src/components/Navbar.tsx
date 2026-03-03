@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
+import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { navLinks } from "@/lib/nav-links";
 
@@ -21,9 +22,9 @@ export function Navbar() {
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
-            <a href="/" className="text-2xl font-bold text-rose-800 dark:text-rose-700">
+            <Link href="/" className="text-2xl font-bold text-rose-800 dark:text-rose-700">
             Flight School Finder
-            </a>
+            </Link>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
