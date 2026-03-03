@@ -33,7 +33,7 @@ export default function RootLayout({
           </main>
 
           {/* Minimal footer */}
-          <footer className="bg-slate-800 dark:bg-slate-900 text-slate-300 py-6 text-center text-sm">
+          <footer className="bg-slate-800 dark:bg-slate-900 text-slate-300 py-8 text-center text-sm">
             <p>
               Flight School Finder © {new Date().getFullYear()} - A coding project by{" "}
               <a
@@ -54,6 +54,14 @@ export default function RootLayout({
               Right Rudder Marketing
               </a>
             </p>
+            <div className="mt-3 flex justify-center gap-6">
+              <a href="/terms-of-service" className="text-slate-400 hover:text-slate-200 transition">
+                Terms of Service
+              </a>
+              <a href="/privacy-policy" className="text-slate-400 hover:text-slate-200 transition">
+                Privacy Policy
+              </a>
+            </div>
           </footer>
         </ThemeProvider>
       </body>
