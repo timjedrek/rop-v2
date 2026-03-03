@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Flight School Finder
 
-## Getting Started
+**A directory for flight schools across the USA.**
 
-First, run the development server:
+Find the right flight school for your aviation journey — searchable by state, city, and airport. Built for aspiring pilots and the flight schools that train them.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This is a comprehensive flight school directory connecting student pilots with certified flight schools nationwide. Whether you're searching for schools near a specific airport, in your city, or across an entire state, we surface the best options with the information you need to make a confident decision.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Built for **student pilots** who want to find quality instruction, and for **flight schools** who want to be found.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## For Student Pilots
 
-## Learn More
+- Search flight schools by **state, city, or airport code**
+- Browse school profiles with programs, certifications, and contact info
+- Read verified reviews from real students
+- Discover schools near major metro areas and regional airports
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## For Flight Schools
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Get discovered by motivated student pilots actively searching
+- Claim and manage your school's listing
+- Showcase your programs, fleet, and instructor credentials
+- Built-in lead generation — no ad spend required
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Powered By & Acknowledgments
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Flight School Finder is proudly developed with insights from the aviation marketing space. Special thanks to **Tim Jedrek**, pilot, software engineer, and founder of [Right Rudder Marketing](https://rightruddermarketing.com/) — the #1 digital marketing agency dedicated to helping flight schools grow enrollments through SEO, Google Ads, websites, and lead nurturing.
+
+Learn more about Tim's work in aviation business growth at [timjedrek.com](https://timjedrek.com/) or explore how Right Rudder Marketing can help scale your flight school at [rightruddermarketing.com](https://rightruddermarketing.com/).
+
+✈️ Let's train more pilots!
