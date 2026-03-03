@@ -30,12 +30,6 @@ export type Airport = {
   faaLid: string | null;
 };
 
-export type OtherLocation = {
-  airportCode: string; // ICAO
-  citySlug: string;
-  stateSlug: string;
-};
-
 export type FlightSchool = {
   id: string;
   name: string;
@@ -44,8 +38,12 @@ export type FlightSchool = {
   primaryAirportCode: string; // ICAO
   citySlug: string;
   stateSlug: string;
-  /** Additional locations for multi-campus schools (e.g. ATP, Tennessee Flight Training) */
-  otherLocations: OtherLocation[];
+  /**
+   * Links this listing to other listings of the same school brand.
+   * All locations of the same organization share the same organizationId.
+   * Single-location schools omit this field.
+   */
+  organizationId?: string;
   programs: string[];
   rating: number;
   reviewCount: number;

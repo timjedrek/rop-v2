@@ -131,11 +131,13 @@ export const airports: Airport[] = [
 ];
 
 // ── Flight Schools ─────────────────────────────────────────────────────────────
-// Matches the 6 schools shown on the home page, plus extras.
-// Schools with otherLocations demonstrate multi-campus support.
+// Each physical location is its own listing.
+// Multi-location brands share an organizationId so their detail pages can
+// cross-link to sibling listings ("Other Locations" section).
 export const flightSchools: FlightSchool[] = [
+  // ── Arizona Pilot Academy (2 locations) ────────────────────────────────────
   {
-    id: "arizona-pilot-academy",
+    id: "arizona-pilot-academy-mesa",
     name: "Arizona Pilot Academy",
     slug: "arizona-pilot-academy",
     description:
@@ -143,15 +145,31 @@ export const flightSchools: FlightSchool[] = [
     primaryAirportCode: "KFFZ",
     citySlug: "mesa",
     stateSlug: "arizona",
-    otherLocations: [
-      { airportCode: "KDVT", citySlug: "phoenix", stateSlug: "arizona" },
-    ],
+    organizationId: "arizona-pilot-academy",
     programs: ["Private Pilot", "Instrument Rating", "Commercial Pilot", "CFI", "Multi-Engine"],
     rating: 4.8,
     reviewCount: 142,
     website: "https://example.com/arizona-pilot-academy",
     phone: "(480) 555-0101",
   },
+  {
+    id: "arizona-pilot-academy-phoenix",
+    name: "Arizona Pilot Academy – Deer Valley",
+    slug: "arizona-pilot-academy-deer-valley",
+    description:
+      "Arizona Pilot Academy's Deer Valley location at Phoenix Deer Valley Airport brings the same experienced instructors and modern fleet to the northwest Phoenix metro.",
+    primaryAirportCode: "KDVT",
+    citySlug: "phoenix",
+    stateSlug: "arizona",
+    organizationId: "arizona-pilot-academy",
+    programs: ["Private Pilot", "Instrument Rating", "Commercial Pilot", "CFI", "Multi-Engine"],
+    rating: 4.7,
+    reviewCount: 58,
+    website: "https://example.com/arizona-pilot-academy",
+    phone: "(602) 555-0102",
+  },
+
+  // ── Midwest Flight Training (single location) ──────────────────────────────
   {
     id: "midwest-flight-training",
     name: "Midwest Flight Training",
@@ -161,13 +179,14 @@ export const flightSchools: FlightSchool[] = [
     primaryAirportCode: "KCPS",
     citySlug: "belleville",
     stateSlug: "illinois",
-    otherLocations: [],
     programs: ["Private Pilot", "Instrument Rating", "Commercial Pilot"],
     rating: 4.6,
     reviewCount: 89,
     website: "https://example.com/midwest-flight-training",
     phone: "(618) 555-0202",
   },
+
+  // ── Suncoast Aviation (single location) ───────────────────────────────────
   {
     id: "suncoast-aviation",
     name: "Suncoast Aviation",
@@ -177,13 +196,14 @@ export const flightSchools: FlightSchool[] = [
     primaryAirportCode: "KPMP",
     citySlug: "pembroke-pines",
     stateSlug: "florida",
-    otherLocations: [],
     programs: ["Private Pilot", "Instrument Rating", "Commercial Pilot", "CFI", "ATP"],
     rating: 4.8,
     reviewCount: 142,
     website: "https://example.com/suncoast-aviation",
     phone: "(954) 555-0303",
   },
+
+  // ── St. Louis Flight Academy (single location) ────────────────────────────
   {
     id: "st-louis-flight-academy",
     name: "St. Louis Flight Academy",
@@ -193,31 +213,48 @@ export const flightSchools: FlightSchool[] = [
     primaryAirportCode: "KSTL",
     citySlug: "st-louis",
     stateSlug: "missouri",
-    otherLocations: [],
     programs: ["Private Pilot", "Instrument Rating", "Commercial Pilot", "Multi-Engine", "ATP"],
     rating: 4.9,
     reviewCount: 67,
     website: "https://example.com/st-louis-flight-academy",
     phone: "(314) 555-0404",
   },
+
+  // ── Heartland Flyers (2 locations) ────────────────────────────────────────
   {
-    id: "heartland-flyers",
+    id: "heartland-flyers-kc",
     name: "Heartland Flyers",
     slug: "heartland-flyers",
     description:
-      "Training Kansas City area pilots for over 20 years from Charles B. Wheeler Downtown Airport with a satellite location at Johnson County Executive in Overland Park, KS.",
+      "Training Kansas City area pilots for over 20 years from Charles B. Wheeler Downtown Airport. Heartland Flyers' downtown location is the gateway to our regional flight training network.",
     primaryAirportCode: "KMKC",
     citySlug: "kansas-city",
     stateSlug: "missouri",
-    otherLocations: [
-      { airportCode: "KOJC", citySlug: "overland-park", stateSlug: "kansas" },
-    ],
+    organizationId: "heartland-flyers",
     programs: ["Private Pilot", "Instrument Rating", "Commercial Pilot", "CFI"],
     rating: 4.8,
     reviewCount: 142,
     website: "https://example.com/heartland-flyers",
     phone: "(816) 555-0505",
   },
+  {
+    id: "heartland-flyers-overland-park",
+    name: "Heartland Flyers – Overland Park",
+    slug: "heartland-flyers-overland-park",
+    description:
+      "Heartland Flyers' Johnson County location at Overland Park Executive Airport serves the Kansas side of the KC metro with the same trusted instruction and fleet.",
+    primaryAirportCode: "KOJC",
+    citySlug: "overland-park",
+    stateSlug: "kansas",
+    organizationId: "heartland-flyers",
+    programs: ["Private Pilot", "Instrument Rating", "Commercial Pilot", "CFI"],
+    rating: 4.7,
+    reviewCount: 61,
+    website: "https://example.com/heartland-flyers",
+    phone: "(913) 555-0506",
+  },
+
+  // ── Pacific Coast Flight School (single location) ─────────────────────────
   {
     id: "pacific-coast-flight-school",
     name: "Pacific Coast Flight School",
@@ -227,13 +264,14 @@ export const flightSchools: FlightSchool[] = [
     primaryAirportCode: "KMYF",
     citySlug: "san-diego",
     stateSlug: "california",
-    otherLocations: [],
     programs: ["Private Pilot", "Instrument Rating", "Commercial Pilot", "CFI", "Seaplane Rating"],
     rating: 4.7,
     reviewCount: 210,
     website: "https://example.com/pacific-coast-flight-school",
     phone: "(619) 555-0606",
   },
+
+  // ── Phoenix Flight Academy (single location) ──────────────────────────────
   {
     id: "phoenix-flight-academy",
     name: "Phoenix Flight Academy",
@@ -243,30 +281,45 @@ export const flightSchools: FlightSchool[] = [
     primaryAirportCode: "KDVT",
     citySlug: "phoenix",
     stateSlug: "arizona",
-    otherLocations: [],
     programs: ["Private Pilot", "Instrument Rating", "Commercial Pilot", "CFI", "Multi-Engine"],
     rating: 4.7,
     reviewCount: 98,
     website: "https://example.com/phoenix-flight-academy",
     phone: "(602) 555-0707",
   },
+
+  // ── Tennessee Flight Training (2 locations) ───────────────────────────────
   {
-    id: "tennessee-flight-training",
+    id: "tennessee-flight-training-nashville",
     name: "Tennessee Flight Training",
     slug: "tennessee-flight-training",
     description:
-      "Tennessee Flight Training operates at Nashville and Chattanooga airports, offering flexible scheduling and a modern fleet to serve students across the state.",
+      "Tennessee Flight Training's Nashville location at BNA offers flexible scheduling and a modern fleet for students in Middle Tennessee.",
     primaryAirportCode: "KBNA",
     citySlug: "nashville",
     stateSlug: "tennessee",
-    otherLocations: [
-      { airportCode: "KCHA", citySlug: "chattanooga", stateSlug: "tennessee" },
-    ],
+    organizationId: "tennessee-flight-training",
     programs: ["Private Pilot", "Instrument Rating", "Commercial Pilot", "CFI"],
     rating: 4.5,
     reviewCount: 73,
     website: "https://example.com/tennessee-flight-training",
     phone: "(615) 555-0808",
+  },
+  {
+    id: "tennessee-flight-training-chattanooga",
+    name: "Tennessee Flight Training – Chattanooga",
+    slug: "tennessee-flight-training-chattanooga",
+    description:
+      "Tennessee Flight Training's Chattanooga location serves East Tennessee pilots with the same quality instruction and fleet as the Nashville campus.",
+    primaryAirportCode: "KCHA",
+    citySlug: "chattanooga",
+    stateSlug: "tennessee",
+    organizationId: "tennessee-flight-training",
+    programs: ["Private Pilot", "Instrument Rating", "Commercial Pilot", "CFI"],
+    rating: 4.4,
+    reviewCount: 38,
+    website: "https://example.com/tennessee-flight-training",
+    phone: "(423) 555-0809",
   },
 ];
 
@@ -284,13 +337,8 @@ export function getAirportsByState(stateSlug: string): Airport[] {
   return airports.filter((a) => a.stateSlug === stateSlug);
 }
 
-/** Returns schools whose primary location OR any otherLocation is in this state */
 export function getSchoolsByState(stateSlug: string): FlightSchool[] {
-  return flightSchools.filter(
-    (s) =>
-      s.stateSlug === stateSlug ||
-      s.otherLocations.some((l) => l.stateSlug === stateSlug),
-  );
+  return flightSchools.filter((s) => s.stateSlug === stateSlug);
 }
 
 /** Look up airport by any of its three identifiers (case-insensitive) */
@@ -314,18 +362,18 @@ export function getAirportsByCity(citySlug: string): Airport[] {
 }
 
 export function getSchoolsByCity(citySlug: string): FlightSchool[] {
-  return flightSchools.filter(
-    (s) =>
-      s.citySlug === citySlug ||
-      s.otherLocations.some((l) => l.citySlug === citySlug),
-  );
+  return flightSchools.filter((s) => s.citySlug === citySlug);
 }
 
 export function getSchoolsByAirport(icao: string): FlightSchool[] {
   const upper = icao.toUpperCase();
+  return flightSchools.filter((s) => s.primaryAirportCode === upper);
+}
+
+/** Returns all sibling listings for the same brand (excludes the given school itself) */
+export function getRelatedSchools(school: FlightSchool): FlightSchool[] {
+  if (!school.organizationId) return [];
   return flightSchools.filter(
-    (s) =>
-      s.primaryAirportCode === upper ||
-      s.otherLocations.some((l) => l.airportCode === upper),
+    (s) => s.organizationId === school.organizationId && s.id !== school.id,
   );
 }

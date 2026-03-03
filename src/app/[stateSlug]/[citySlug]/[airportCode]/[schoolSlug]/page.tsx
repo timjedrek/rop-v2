@@ -8,6 +8,7 @@ import {
   getCityBySlug,
   getStateBySlug,
   getAirportByCode,
+  getRelatedSchools,
 } from "@/lib/mock-data";
 
 type Props = {
@@ -49,12 +50,12 @@ export default async function SchoolDetailPage({ params }: Props) {
   const state = getStateBySlug(school.stateSlug);
   const primaryAirport = getAirportByCode(school.primaryAirportCode);
 
-  // Resolve other locations
-  const otherLocations = school.otherLocations.map((loc) => ({
-    ...loc,
-    airport: getAirportByCode(loc.airportCode),
-    city: getCityBySlug(loc.citySlug),
-    state: getStateBySlug(loc.stateSlug),
+  // Resolve sibling listings for the same brand
+  const relatedSchools = getRelatedSchools(school).map((s) => ({
+    ...s,
+    airport: getAirportByCode(s.primaryAirportCode),
+    city: getCityBySlug(s.citySlug),
+    state: getStateBySlug(s.stateSlug),
   }));
 
   // JSON-LD LocalBusiness structured data
@@ -242,33 +243,31 @@ export default async function SchoolDetailPage({ params }: Props) {
             </div>
           </section>
 
-          {/* Other locations */}
-          {otherLocations.length > 0 && (
+          {/* Other locations — sibling listings for the same brand */}
+          {relatedSchools.length > 0 && (
             <section>
               <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">
                 Other Locations
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {otherLocations.map((loc) => (
+                {relatedSchools.map((sibling) => (
                   <Link
-                    key={loc.airportCode}
-                    href={`/airports/${loc.airportCode.toLowerCase()}`}
+                    key={sibling.id}
+                    href={`/${sibling.stateSlug}/${sibling.citySlug}/${sibling.primaryAirportCode.toLowerCase()}/${sibling.slug}`}
                     className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500 transition"
                   >
-                    <div className="flex items-start justify-between mb-1">
-                      <span className="font-mono font-bold text-blue-700 dark:text-blue-400 group-hover:text-blue-600 text-lg">
-                        {loc.airportCode}
-                      </span>
-                    </div>
-                    {loc.airport && (
-                      <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                        {loc.airport.name}
+                    <p className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition mb-1">
+                      {sibling.name}
+                    </p>
+                    {sibling.airport && (
+                      <p className="font-mono text-sm text-blue-700 dark:text-blue-400">
+                        {sibling.primaryAirportCode} – {sibling.airport.name}
                       </p>
                     )}
-                    {loc.city && loc.state && (
+                    {sibling.city && sibling.state && (
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
                         <MapPin size={12} />
-                        {loc.city.name}, {loc.state.abbreviation}
+                        {sibling.city.name}, {sibling.state.abbreviation}
                       </p>
                     )}
                   </Link>
