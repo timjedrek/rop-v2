@@ -80,11 +80,9 @@ export function Navbar() {
       {/* Mobile dropdown — expands from top-right */}
       <div
         className={`
-          md:hidden absolute right-4 mt-1
-          bg-white dark:bg-slate-900 border dark:border-slate-700
-          rounded-lg shadow-lg overflow-hidden
-          origin-top-right transition-all duration-200
-          ${open ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}
+          md:hidden fixed inset-0 bg-white dark:bg-slate-900
+          transition-all duration-200 mt-16
+          ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
         `}
       >
         <nav className="flex flex-col py-2 min-w-44">
