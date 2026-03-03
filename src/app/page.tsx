@@ -29,7 +29,7 @@ export default function Home() {
 
       {/* Featured schools placeholder */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-rose-800">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-rose-800 dark:text-rose-700">
           Featured Flight Schools
         </h2>
 
@@ -38,14 +38,14 @@ export default function Home() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+              className="bg-white dark:bg-slate-900 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
             >
-              <div className="h-48 bg-gradient-to-br from-slate-200 to-slate-300" />
+              <div className="h-48 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 " />
               <div className="p-6">
-                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
                   Example Flight School {i + 1}
                 </h3>
-                <p className="text-slate-600">City, State • 4.8 ★ (120+ reviews)</p>
+                <p className="text-slate-600 dark:text-slate-400">City, State • 4.8 ★ (120+ reviews)</p>
               </div>
             </div>
           ))}

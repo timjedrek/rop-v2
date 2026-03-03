@@ -29,7 +29,7 @@ export default function RootLayout({
           <header className="bg-white dark:bg-slate-900 border-b dark:border-slate-700 sticky top-0 z-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
-                <div className="text-2xl font-bold text-rose-800 dark:text-rose-400">
+                <div className="text-2xl font-bold text-rose-800 dark:text-rose-700">
                   Flight School Finder
                 </div>
                 <nav className="flex items-center space-x-6 text-sm font-medium">
@@ -44,7 +44,7 @@ export default function RootLayout({
           </header>
 
           {/* Where the actual page content goes */}
-          <main className="min-h-screen bg-slate-100 dark:bg-slate-950">
+          <main className="min-h-screen bg-slate-100 dark:bg-slate-800">
             {children}
           </main>
 
