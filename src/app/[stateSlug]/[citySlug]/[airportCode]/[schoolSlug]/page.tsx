@@ -10,6 +10,7 @@ import {
   getAirportByCode,
   getRelatedSchools,
   getReviewsBySchool,
+  getCommentsByReview,
   getProgramsBySchool,
   getAircraftBySchool,
 } from "@/lib/mock-data";
@@ -62,6 +63,9 @@ export default async function SchoolDetailPage({ params }: Props) {
   const primaryAirport = getAirportByCode(school.primaryAirportCode);
 
   const schoolReviews = getReviewsBySchool(school.id);
+  const commentsByReview = Object.fromEntries(
+    schoolReviews.map((r) => [r.id, getCommentsByReview(r.id)])
+  );
   const schoolPrograms = getProgramsBySchool(school);
   const schoolAircraft = getAircraftBySchool(school);
 
@@ -395,7 +399,7 @@ export default async function SchoolDetailPage({ params }: Props) {
             <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">
               Student Reviews
             </h2>
-            <ReviewsSection reviews={schoolReviews} />
+            <ReviewsSection reviews={schoolReviews} commentsByReview={commentsByReview} />
           </section>
 
           {/* Write a Review */}

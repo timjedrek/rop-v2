@@ -1,15 +1,17 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Star, User as UserIcon, ShieldCheck, BookOpen, PlaneTakeoff } from "lucide-react";
+import { Star, MessageSquare, User as UserIcon, ShieldCheck, BookOpen, PlaneTakeoff } from "lucide-react";
 import {
   getUserById,
   getReviewsByUser,
+  getCommentsByUser,
   getSchoolsManagedByUser,
   getSchoolBySlug,
   getCityBySlug,
   getStateBySlug,
   getProgramBySlug,
+  reviews as allReviews,
   users,
 } from "@/lib/mock-data";
 import { schoolHref } from "@/lib/utils";
@@ -37,6 +39,7 @@ export default async function ProfilePage({ params }: Props) {
   if (!user) notFound();
 
   const reviews = getReviewsByUser(userId);
+  const userComments = getCommentsByUser(userId);
   const managedSchools = getSchoolsManagedByUser(userId);
   const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
   const joinedYear = new Date(user.joinedAt).getFullYear();
@@ -147,13 +150,39 @@ export default async function ProfilePage({ params }: Props) {
                           <Star
                             key={i}
                             className={`w-4 h-4 ${
-                              i < review.rating
+                              i < review.overall
                                 ? "fill-yellow-400 text-yellow-400"
                                 : "text-slate-300 dark:text-slate-600"
                             }`}
                           />
                         ))}
                       </div>
+                    </div>
+                    {/* Subcategory scores */}
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-1 mb-3 py-2.5 border-y border-slate-100 dark:border-slate-800">
+                      {(["customerService", "instructors", "aircraft", "availability", "facilities"] as const).map((key) => {
+                        const labels: Record<string, string> = {
+                          customerService: "Customer Service",
+                          instructors: "Instructors",
+                          aircraft: "Aircraft",
+                          availability: "Availability",
+                          facilities: "Facilities",
+                        };
+                        return (
+                          <div key={key} className="flex items-center justify-between gap-2">
+                            <span className="text-xs text-slate-500 dark:text-slate-400">{labels[key]}</span>
+                            <div className="flex items-center gap-0.5">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  size={11}
+                                  className={i < review[key] ? "fill-amber-400 text-amber-400" : "text-slate-300 dark:text-slate-600"}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                     <p className="text-slate-600 dark:text-slate-300 text-sm">{review.body}</p>
                     <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
@@ -163,6 +192,63 @@ export default async function ProfilePage({ params }: Props) {
                         year: "numeric",
                       })}
                     </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* Comments */}
+        <section>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-blue-700" />
+            Comments
+            <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
+              ({userComments.length})
+            </span>
+          </h2>
+
+          {userComments.length === 0 ? (
+            <p className="text-slate-500 dark:text-slate-400 text-sm">No comments yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {userComments.map((comment) => {
+                const review = allReviews.find((r) => r.id === comment.reviewId);
+                const school = review ? getSchoolBySlug(review.schoolId) : null;
+                const href = school ? schoolHref(school) : null;
+                return (
+                  <div
+                    key={comment.id}
+                    className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4"
+                  >
+                    <div className="flex items-start justify-between gap-4 mb-1.5">
+                      <div>
+                        {href && school ? (
+                          <Link
+                            href={href}
+                            className="text-sm font-semibold text-slate-900 dark:text-white hover:text-blue-700 dark:hover:text-blue-400 transition"
+                          >
+                            {school.name}
+                          </Link>
+                        ) : (
+                          <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                            Review
+                          </span>
+                        )}
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                          Comment on a review
+                        </p>
+                      </div>
+                      <span className="text-xs text-slate-400 dark:text-slate-500 shrink-0">
+                        {new Date(comment.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-600 dark:text-slate-300">{comment.body}</p>
                   </div>
                 );
               })}

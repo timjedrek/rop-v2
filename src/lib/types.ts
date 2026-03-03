@@ -128,7 +128,24 @@ export type Review = {
   schoolId: string;
   /** Links to users.id */
   userId: string;
-  rating: number;
+  /** Overall 1–5 star rating */
+  overall: number;
+  /** Subcategory ratings 1–5 */
+  customerService: number;
+  instructors: number;
+  aircraft: number;
+  availability: number;
+  facilities: number;
+  body: string;
+  createdAt: string; // ISO date string
+};
+
+export type Comment = {
+  id: string;
+  /** Links to reviews.id */
+  reviewId: string;
+  /** Links to users.id */
+  userId: string;
   body: string;
   createdAt: string; // ISO date string
 };

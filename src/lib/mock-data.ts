@@ -1,4 +1,4 @@
-import type { State, City, Airport, FlightSchool, Review, Program, TrainerAircraft, User } from "./types";
+import type { State, City, Airport, FlightSchool, Review, Comment, Program, TrainerAircraft, User } from "./types";
 
 // ── States (all 50) ────────────────────────────────────────────────────────────
 // schoolCount / airportCount are denormalized display values.
@@ -938,27 +938,49 @@ export function getSchoolsByAircraftSlug(aircraftSlug: string): FlightSchool[] {
 // ── Reviews ────────────────────────────────────────────────────────────────────
 export const reviews: Review[] = [
   // arizona-pilot-academy-mesa
-  { id: "r1",  schoolId: "arizona-pilot-academy-mesa",  rating: 5, userId: "a3k9xm2", createdAt: "2025-11-10", body: "Excellent instructors and a modern fleet. Got my PPL in 8 months — highly recommend." },
-  { id: "r2",  schoolId: "arizona-pilot-academy-mesa",  rating: 5, userId: "b8t4vy6", createdAt: "2025-09-22", body: "Great environment for learning. Scheduling is easy and their DPE first-time pass rate speaks for itself." },
-  { id: "r3",  schoolId: "arizona-pilot-academy-mesa",  rating: 4, userId: "d4m7nj1", createdAt: "2025-07-05", body: "Good school overall. Planes are well-maintained. Wish ground school was a bit more structured." },
-  { id: "r4",  schoolId: "arizona-pilot-academy-mesa",  rating: 5, userId: "e9q3fz5", createdAt: "2025-04-17", body: "Did my instrument rating here after training elsewhere — night and day difference in instruction quality." },
+  { id: "r1",  schoolId: "arizona-pilot-academy-mesa",  userId: "a3k9xm2", createdAt: "2025-11-10", overall: 5, customerService: 5, instructors: 5, aircraft: 5, availability: 4, facilities: 5, body: "Excellent instructors and a modern fleet. Got my PPL in 8 months — highly recommend." },
+  { id: "r2",  schoolId: "arizona-pilot-academy-mesa",  userId: "b8t4vy6", createdAt: "2025-09-22", overall: 5, customerService: 5, instructors: 5, aircraft: 4, availability: 5, facilities: 4, body: "Great environment for learning. Scheduling is easy and their DPE first-time pass rate speaks for itself." },
+  { id: "r3",  schoolId: "arizona-pilot-academy-mesa",  userId: "d4m7nj1", createdAt: "2025-07-05", overall: 4, customerService: 4, instructors: 4, aircraft: 5, availability: 3, facilities: 4, body: "Good school overall. Planes are well-maintained. Wish ground school was a bit more structured." },
+  { id: "r4",  schoolId: "arizona-pilot-academy-mesa",  userId: "e9q3fz5", createdAt: "2025-04-17", overall: 5, customerService: 4, instructors: 5, aircraft: 5, availability: 5, facilities: 5, body: "Did my instrument rating here after training elsewhere — night and day difference in instruction quality." },
   // suncoast-aviation
-  { id: "r5",  schoolId: "suncoast-aviation",           rating: 5, userId: "p7r2wq8", createdAt: "2025-12-01", body: "Year-round VFR makes training incredibly efficient. Finished my commercial in under 14 months." },
-  { id: "r6",  schoolId: "suncoast-aviation",           rating: 5, userId: "f2k8vr3", createdAt: "2025-10-14", body: "The ATP pipeline here is top-notch. Several instructors are current airline pilots, which is invaluable." },
-  { id: "r7",  schoolId: "suncoast-aviation",           rating: 4, userId: "g6w1yx0", createdAt: "2025-08-30", body: "Solid school. Busy ramp can delay flights during peak season but it's manageable." },
+  { id: "r5",  schoolId: "suncoast-aviation",           userId: "p7r2wq8", createdAt: "2025-12-01", overall: 5, customerService: 5, instructors: 5, aircraft: 5, availability: 5, facilities: 4, body: "Year-round VFR makes training incredibly efficient. Finished my commercial in under 14 months." },
+  { id: "r6",  schoolId: "suncoast-aviation",           userId: "f2k8vr3", createdAt: "2025-10-14", overall: 5, customerService: 5, instructors: 5, aircraft: 4, availability: 4, facilities: 5, body: "The ATP pipeline here is top-notch. Several instructors are current airline pilots, which is invaluable." },
+  { id: "r7",  schoolId: "suncoast-aviation",           userId: "g6w1yx0", createdAt: "2025-08-30", overall: 4, customerService: 4, instructors: 4, aircraft: 4, availability: 3, facilities: 4, body: "Solid school. Busy ramp can delay flights during peak season but it's manageable." },
   // pacific-coast-flight-school
-  { id: "r8",  schoolId: "pacific-coast-flight-school", rating: 5, userId: "c2n5hz9", createdAt: "2026-01-08", body: "Training over the San Diego coast is breathtaking. The seaplane add-on is a bucket-list experience." },
-  { id: "r9",  schoolId: "pacific-coast-flight-school", rating: 4, userId: "h5t9bq7", createdAt: "2025-11-30", body: "Great instructors and facilities. Worth every penny for the training environment alone." },
+  { id: "r8",  schoolId: "pacific-coast-flight-school", userId: "c2n5hz9", createdAt: "2026-01-08", overall: 5, customerService: 5, instructors: 5, aircraft: 5, availability: 4, facilities: 5, body: "Training over the San Diego coast is breathtaking. The seaplane add-on is a bucket-list experience." },
+  { id: "r9",  schoolId: "pacific-coast-flight-school", userId: "h5t9bq7", createdAt: "2025-11-30", overall: 4, customerService: 4, instructors: 5, aircraft: 4, availability: 4, facilities: 4, body: "Great instructors and facilities. Worth every penny for the training environment alone." },
   // st-louis-flight-academy
-  { id: "r10", schoolId: "st-louis-flight-academy",     rating: 5, userId: "b8t4vy6", createdAt: "2026-02-12", body: "Best flight school in the Midwest. Very professional operation from front desk all the way through checkrides." },
-  { id: "r11", schoolId: "st-louis-flight-academy",     rating: 5, userId: "j3p6cs4", createdAt: "2025-12-19", body: "Knocked out my commercial multi-engine add-on in record time using their ATP prep track." },
+  { id: "r10", schoolId: "st-louis-flight-academy",     userId: "b8t4vy6", createdAt: "2026-02-12", overall: 5, customerService: 5, instructors: 5, aircraft: 5, availability: 5, facilities: 5, body: "Best flight school in the Midwest. Very professional operation from front desk all the way through checkrides." },
+  { id: "r11", schoolId: "st-louis-flight-academy",     userId: "j3p6cs4", createdAt: "2025-12-19", overall: 5, customerService: 4, instructors: 5, aircraft: 5, availability: 4, facilities: 4, body: "Knocked out my commercial multi-engine add-on in record time using their ATP prep track." },
   // heartland-flyers-kc
-  { id: "r12", schoolId: "heartland-flyers-kc",         rating: 5, userId: "k8n2ew6", createdAt: "2025-10-03", body: "20 years of reputation for a reason. Instructors are patient and incredibly thorough." },
-  { id: "r13", schoolId: "heartland-flyers-kc",         rating: 4, userId: "m1r7oa9", createdAt: "2025-09-11", body: "Good training and loved the downtown airport location. Easy commute from the city." },
+  { id: "r12", schoolId: "heartland-flyers-kc",         userId: "k8n2ew6", createdAt: "2025-10-03", overall: 5, customerService: 5, instructors: 5, aircraft: 4, availability: 4, facilities: 4, body: "20 years of reputation for a reason. Instructors are patient and incredibly thorough." },
+  { id: "r13", schoolId: "heartland-flyers-kc",         userId: "m1r7oa9", createdAt: "2025-09-11", overall: 4, customerService: 4, instructors: 4, aircraft: 4, availability: 4, facilities: 3, body: "Good training and loved the downtown airport location. Easy commute from the city." },
 ];
 
 export function getReviewsBySchool(schoolId: string): Review[] {
   return reviews.filter((r) => r.schoolId === schoolId);
+}
+
+// ── Comments ───────────────────────────────────────────────────────────────────
+export const comments: Comment[] = [
+  { id: "c1",  reviewId: "r1",  userId: "b8t4vy6", createdAt: "2025-11-12", body: "Same experience here! Which instructor did you fly with?" },
+  { id: "c2",  reviewId: "r1",  userId: "d4m7nj1", createdAt: "2025-11-14", body: "CFI availability was the only hiccup I ran into — worth calling ahead to book." },
+  { id: "c3",  reviewId: "r2",  userId: "a3k9xm2", createdAt: "2025-09-25", body: "Agreed on scheduling — their online booking system is the best I've used at any school." },
+  { id: "c4",  reviewId: "r3",  userId: "e9q3fz5", createdAt: "2025-07-08", body: "Ground school has improved since they brought on a new ground instructor last fall." },
+  { id: "c5",  reviewId: "r5",  userId: "f2k8vr3", createdAt: "2025-12-03", body: "14 months commercial is impressive — how many hours did you end up with total?" },
+  { id: "c6",  reviewId: "r5",  userId: "g6w1yx0", createdAt: "2025-12-05", body: "Florida weather really does make a huge difference. Zero weather cancellations in my first 3 months." },
+  { id: "c7",  reviewId: "r6",  userId: "p7r2wq8", createdAt: "2025-10-16", body: "The airline connections they have are unreal. Two of my instructors were flying 737s within a year." },
+  { id: "c8",  reviewId: "r8",  userId: "h5t9bq7", createdAt: "2026-01-10", body: "The coastal flying is something else — nothing beats shooting approaches over the Pacific." },
+  { id: "c9",  reviewId: "r10", userId: "j3p6cs4", createdAt: "2026-02-14", body: "Front desk team really does set the tone — super welcoming from day one." },
+  { id: "c10", reviewId: "r12", userId: "m1r7oa9", createdAt: "2025-10-06", body: "That patience is no joke. My CFI walked me through slow flight at least a dozen times without batting an eye." },
+];
+
+export function getCommentsByReview(reviewId: string): Comment[] {
+  return comments.filter((c) => c.reviewId === reviewId);
+}
+
+export function getCommentsByUser(userId: string): Comment[] {
+  return comments.filter((c) => c.userId === userId);
 }
 
 // ── Users ──────────────────────────────────────────────────────────────────────
