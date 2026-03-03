@@ -45,9 +45,9 @@ export default function Home() {
         </div>
       </section>
       {/* Why Create an Account */}
-      <section className="bg-slate-50 dark:bg-slate-900 py-16">
+      <section className="bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-rose-800 dark:text-rose-700">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-blue-800 dark:text-blue-400">
             Why Create an Account?
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -73,8 +73,10 @@ export default function Home() {
               //   icon: "⭐",
               // },
             ].map((item) => (
-              <div key={item.title} className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md text-center">
-                <div className="text-4xl mb-4">{item.icon}</div>
+              <div key={item.title} className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 text-center">
+                <div className="text-4xl mb-4 w-16 h-16 flex items-center justify-center mx-auto rounded-full bg-gradient-to-br from-blue-100 to-slate-100 dark:from-slate-700 dark:to-slate-600">
+                  {item.icon}
+                </div>
                 <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-2">{item.title}</h3>
                 <p className="text-slate-600 dark:text-slate-400">{item.description}</p>
               </div>
@@ -107,7 +109,7 @@ export default function Home() {
       {/* Update or Add Flight School */}
       <section className="bg-slate-50 dark:bg-slate-900 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-rose-800 dark:text-rose-700">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-blue-800 dark:text-blue-400">
         Looking to Update or Add Your Flight School?
           </h2>
           <div className="max-w-3xl mx-auto bg-white dark:bg-slate-800 rounded-lg shadow-md p-8 space-y-6 text-slate-700 dark:text-slate-300 ">
@@ -118,7 +120,7 @@ export default function Home() {
           After submission, our team will review your listing to ensure all information is accurate and complete. Once approved, your flight school will be published on our platform, making it visible to potential students searching for flight training in your area.
         </p>
         <div className="text-center pt-4">
-          <button className="px-6 py-3 bg-rose-700 text-white font-semibold rounded-md hover:bg-rose-800 transition">
+          <button className="px-6 py-3 bg-blue-700 text-white font-semibold rounded-md hover:bg-blue-800 transition">
             Create Account
           </button>
         </div>
@@ -139,7 +141,7 @@ export default function Home() {
         Private instruction offers more flexibility in scheduling, one-on-one attention, and potentially a more tailored learning experience that fits your specific needs and learning style.
           </p>
           <div className="text-center pt-4">
-        <button className="px-6 py-3 border-2 border-rose-700 text-rose-700 font-semibold rounded-md hover:bg-rose-50 transition">
+        <button className="bg-rose-800 text-white px-4 py-3 rounded hover:bg-rose-700 transition">
           Connect with Private CFIs
         </button>
           </div>

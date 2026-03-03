@@ -40,7 +40,7 @@ export default function RootLayout({
               href="https://timjedrek.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-rose-500 hover:underline"
+              className="text-blue-500 hover:underline"
               >
               Tim Jedrek
               </a>
@@ -49,7 +49,7 @@ export default function RootLayout({
               href="https://rightruddermarketing.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-rose-500 hover:underline"
+              className="text-blue-500 hover:underline"
               >
               Right Rudder Marketing
               </a>
