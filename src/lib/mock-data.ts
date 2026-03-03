@@ -1,4 +1,4 @@
-import type { State, City, Airport, FlightSchool, Review, Program, TrainerAircraft } from "./types";
+import type { State, City, Airport, FlightSchool, Review, Program, TrainerAircraft, User } from "./types";
 
 // ── States (all 50) ────────────────────────────────────────────────────────────
 // schoolCount / airportCount are denormalized display values.
@@ -586,6 +586,7 @@ export const flightSchools: FlightSchool[] = [
     aircraftSlugs: ["cessna-172-skyhawk", "piper-pa28-cherokee", "beechcraft-baron-58", "cessna-182-skylane"],
     estimatedPlanes: "10-20",
     estimatedInstructors: "10-20",
+    managedBy: "a3k9xm2",
     contacts: [
       { name: "Robert Hale", title: "Owner / Chief Pilot", phone: "(480) 555-0101", email: "rhale@example.com" },
       { name: "Maria Santos", title: "Director of Training", phone: "(480) 555-0103", email: "msantos@example.com" },
@@ -662,6 +663,7 @@ export const flightSchools: FlightSchool[] = [
     aircraftSlugs: ["cessna-172-skyhawk", "cessna-182-skylane", "piper-pa44-seminole", "beechcraft-baron-58", "diamond-da20"],
     estimatedPlanes: "20-30",
     estimatedInstructors: "20-30",
+    managedBy: "p7r2wq8",
     contacts: [
       { name: "Carlos Vega", title: "Owner", phone: "(954) 555-0303", email: "cvega@example.com" },
       { name: "Angela Marsh", title: "Chief Pilot / Director of Training", phone: "(954) 555-0304", email: "amarsh@example.com" },
@@ -936,25 +938,146 @@ export function getSchoolsByAircraftSlug(aircraftSlug: string): FlightSchool[] {
 // ── Reviews ────────────────────────────────────────────────────────────────────
 export const reviews: Review[] = [
   // arizona-pilot-academy-mesa
-  { id: "r1",  schoolId: "arizona-pilot-academy-mesa",  rating: 5, authorName: "Jake M.",   createdAt: "2025-11-10", body: "Excellent instructors and a modern fleet. Got my PPL in 8 months — highly recommend." },
-  { id: "r2",  schoolId: "arizona-pilot-academy-mesa",  rating: 5, authorName: "Sara T.",   createdAt: "2025-09-22", body: "Great environment for learning. Scheduling is easy and their DPE first-time pass rate speaks for itself." },
-  { id: "r3",  schoolId: "arizona-pilot-academy-mesa",  rating: 4, authorName: "Carlos R.", createdAt: "2025-07-05", body: "Good school overall. Planes are well-maintained. Wish ground school was a bit more structured." },
-  { id: "r4",  schoolId: "arizona-pilot-academy-mesa",  rating: 5, authorName: "Aisha K.",  createdAt: "2025-04-17", body: "Did my instrument rating here after training elsewhere — night and day difference in instruction quality." },
+  { id: "r1",  schoolId: "arizona-pilot-academy-mesa",  rating: 5, userId: "a3k9xm2", createdAt: "2025-11-10", body: "Excellent instructors and a modern fleet. Got my PPL in 8 months — highly recommend." },
+  { id: "r2",  schoolId: "arizona-pilot-academy-mesa",  rating: 5, userId: "b8t4vy6", createdAt: "2025-09-22", body: "Great environment for learning. Scheduling is easy and their DPE first-time pass rate speaks for itself." },
+  { id: "r3",  schoolId: "arizona-pilot-academy-mesa",  rating: 4, userId: "d4m7nj1", createdAt: "2025-07-05", body: "Good school overall. Planes are well-maintained. Wish ground school was a bit more structured." },
+  { id: "r4",  schoolId: "arizona-pilot-academy-mesa",  rating: 5, userId: "e9q3fz5", createdAt: "2025-04-17", body: "Did my instrument rating here after training elsewhere — night and day difference in instruction quality." },
   // suncoast-aviation
-  { id: "r5",  schoolId: "suncoast-aviation",           rating: 5, authorName: "Mike D.",   createdAt: "2025-12-01", body: "Year-round VFR makes training incredibly efficient. Finished my commercial in under 14 months." },
-  { id: "r6",  schoolId: "suncoast-aviation",           rating: 5, authorName: "Priya N.",  createdAt: "2025-10-14", body: "The ATP pipeline here is top-notch. Several instructors are current airline pilots, which is invaluable." },
-  { id: "r7",  schoolId: "suncoast-aviation",           rating: 4, authorName: "Tom W.",    createdAt: "2025-08-30", body: "Solid school. Busy ramp can delay flights during peak season but it's manageable." },
+  { id: "r5",  schoolId: "suncoast-aviation",           rating: 5, userId: "p7r2wq8", createdAt: "2025-12-01", body: "Year-round VFR makes training incredibly efficient. Finished my commercial in under 14 months." },
+  { id: "r6",  schoolId: "suncoast-aviation",           rating: 5, userId: "f2k8vr3", createdAt: "2025-10-14", body: "The ATP pipeline here is top-notch. Several instructors are current airline pilots, which is invaluable." },
+  { id: "r7",  schoolId: "suncoast-aviation",           rating: 4, userId: "g6w1yx0", createdAt: "2025-08-30", body: "Solid school. Busy ramp can delay flights during peak season but it's manageable." },
   // pacific-coast-flight-school
-  { id: "r8",  schoolId: "pacific-coast-flight-school", rating: 5, authorName: "Lisa C.",   createdAt: "2026-01-08", body: "Training over the San Diego coast is breathtaking. The seaplane add-on is a bucket-list experience." },
-  { id: "r9",  schoolId: "pacific-coast-flight-school", rating: 4, authorName: "Omar F.",   createdAt: "2025-11-30", body: "Great instructors and facilities. Worth every penny for the training environment alone." },
+  { id: "r8",  schoolId: "pacific-coast-flight-school", rating: 5, userId: "c2n5hz9", createdAt: "2026-01-08", body: "Training over the San Diego coast is breathtaking. The seaplane add-on is a bucket-list experience." },
+  { id: "r9",  schoolId: "pacific-coast-flight-school", rating: 4, userId: "h5t9bq7", createdAt: "2025-11-30", body: "Great instructors and facilities. Worth every penny for the training environment alone." },
   // st-louis-flight-academy
-  { id: "r10", schoolId: "st-louis-flight-academy",     rating: 5, authorName: "Beth H.",   createdAt: "2026-02-12", body: "Best flight school in the Midwest. Very professional operation from front desk all the way through checkrides." },
-  { id: "r11", schoolId: "st-louis-flight-academy",     rating: 5, authorName: "Dave P.",   createdAt: "2025-12-19", body: "Knocked out my commercial multi-engine add-on in record time using their ATP prep track." },
+  { id: "r10", schoolId: "st-louis-flight-academy",     rating: 5, userId: "b8t4vy6", createdAt: "2026-02-12", body: "Best flight school in the Midwest. Very professional operation from front desk all the way through checkrides." },
+  { id: "r11", schoolId: "st-louis-flight-academy",     rating: 5, userId: "j3p6cs4", createdAt: "2025-12-19", body: "Knocked out my commercial multi-engine add-on in record time using their ATP prep track." },
   // heartland-flyers-kc
-  { id: "r12", schoolId: "heartland-flyers-kc",         rating: 5, authorName: "Hannah L.", createdAt: "2025-10-03", body: "20 years of reputation for a reason. Instructors are patient and incredibly thorough." },
-  { id: "r13", schoolId: "heartland-flyers-kc",         rating: 4, authorName: "Raj S.",    createdAt: "2025-09-11", body: "Good training and loved the downtown airport location. Easy commute from the city." },
+  { id: "r12", schoolId: "heartland-flyers-kc",         rating: 5, userId: "k8n2ew6", createdAt: "2025-10-03", body: "20 years of reputation for a reason. Instructors are patient and incredibly thorough." },
+  { id: "r13", schoolId: "heartland-flyers-kc",         rating: 4, userId: "m1r7oa9", createdAt: "2025-09-11", body: "Good training and loved the downtown airport location. Easy commute from the city." },
 ];
 
 export function getReviewsBySchool(schoolId: string): Review[] {
   return reviews.filter((r) => r.schoolId === schoolId);
+}
+
+// ── Users ──────────────────────────────────────────────────────────────────────
+export const users: User[] = [
+  {
+    id: "a3k9xm2",
+    firstName: "Jake",
+    lastName: "Miller",
+    role: "user",
+    joinedAt: "2025-03-14",
+    bio: "Private pilot based in the Phoenix metro. Working toward my instrument rating.",
+    pilotCertificates: ["private-pilot", "discovery-flight"],
+  },
+  {
+    id: "b8t4vy6",
+    firstName: "Sara",
+    lastName: "Torres",
+    role: "user",
+    joinedAt: "2024-11-02",
+    bio: "Commercial pilot and aspiring CFI. Passionate about making flight training accessible.",
+    pilotCertificates: ["private-pilot", "instrument-rating", "commercial-pilot"],
+  },
+  {
+    id: "p7r2wq8",
+    firstName: "Mike",
+    lastName: "Davis",
+    role: "user",
+    joinedAt: "2024-08-19",
+    bio: "ATP-track student at Suncoast Aviation. Florida flying is unbeatable.",
+    pilotCertificates: ["private-pilot", "instrument-rating", "commercial-pilot", "cfi"],
+  },
+  {
+    id: "c2n5hz9",
+    firstName: "Lisa",
+    lastName: "Chen",
+    role: "admin",
+    joinedAt: "2024-01-05",
+    bio: "Site admin and seaplane rating holder. Former CFI with 3,000+ hours.",
+    pilotCertificates: ["private-pilot", "instrument-rating", "commercial-pilot", "cfi", "cfii", "atp", "seaplane-rating"],
+  },
+  {
+    id: "d4m7nj1",
+    firstName: "Carlos",
+    lastName: "Reyes",
+    role: "user",
+    joinedAt: "2025-05-20",
+    pilotCertificates: ["student-pilot"],
+  },
+  {
+    id: "e9q3fz5",
+    firstName: "Aisha",
+    lastName: "Khan",
+    role: "user",
+    joinedAt: "2024-12-10",
+    bio: "Instrument-rated pilot. Love flying in the Southwest.",
+    pilotCertificates: ["private-pilot", "instrument-rating"],
+  },
+  {
+    id: "f2k8vr3",
+    firstName: "Priya",
+    lastName: "Nair",
+    role: "user",
+    joinedAt: "2025-01-30",
+    bio: "ATP-track student. Aspiring airline pilot.",
+    pilotCertificates: ["private-pilot", "instrument-rating", "commercial-pilot"],
+  },
+  {
+    id: "g6w1yx0",
+    firstName: "Tom",
+    lastName: "Walsh",
+    role: "user",
+    joinedAt: "2024-09-14",
+    pilotCertificates: ["private-pilot"],
+  },
+  {
+    id: "h5t9bq7",
+    firstName: "Omar",
+    lastName: "Farouk",
+    role: "user",
+    joinedAt: "2025-08-03",
+    bio: "Private pilot based in Southern California. Love the coastal flying.",
+    pilotCertificates: ["private-pilot", "instrument-rating"],
+  },
+  {
+    id: "j3p6cs4",
+    firstName: "Dave",
+    lastName: "Peterson",
+    role: "user",
+    joinedAt: "2024-07-22",
+    pilotCertificates: ["private-pilot", "instrument-rating", "commercial-pilot", "mei"],
+  },
+  {
+    id: "k8n2ew6",
+    firstName: "Hannah",
+    lastName: "Lee",
+    role: "user",
+    joinedAt: "2024-03-11",
+    bio: "Student pilot working toward my PPL at Heartland. Best decision I've made.",
+    pilotCertificates: ["student-pilot"],
+  },
+  {
+    id: "m1r7oa9",
+    firstName: "Raj",
+    lastName: "Sharma",
+    role: "user",
+    joinedAt: "2024-06-18",
+    bio: "Private pilot, Kansas City native. Love flying out of Downtown Airport.",
+    pilotCertificates: ["private-pilot"],
+  },
+];
+
+export function getUserById(id: string): User | undefined {
+  return users.find((u) => u.id === id);
+}
+
+export function getReviewsByUser(userId: string): Review[] {
+  return reviews.filter((r) => r.userId === userId);
+}
+
+export function getSchoolsManagedByUser(userId: string): FlightSchool[] {
+  return flightSchools.filter((s) => s.managedBy === userId);
 }

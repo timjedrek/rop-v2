@@ -119,13 +119,31 @@ export type FlightSchool = {
   aircraftSlugs?: string[];
   estimatedPlanes?: FleetRange;
   estimatedInstructors?: FleetRange;
+  /** Phase 2+: id of the registered user who claimed/manages this listing */
+  managedBy?: string;
 };
 
 export type Review = {
   id: string;
   schoolId: string;
+  /** Links to users.id */
+  userId: string;
   rating: number;
   body: string;
-  authorName: string;
   createdAt: string; // ISO date string
+};
+
+export type UserRole = "user" | "admin";
+
+export type User = {
+  /** 7-character random ID — used as the profile URL segment: /profile/[id] */
+  id: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  /** ISO date string */
+  joinedAt: string;
+  bio?: string;
+  /** Program slugs from the programs catalog — certificates/ratings the user holds */
+  pilotCertificates?: string[];
 };

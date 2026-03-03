@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { Star } from "lucide-react";
 import type { Review } from "@/lib/types";
+import { getUserById, getProgramBySlug } from "@/lib/mock-data";
 
 function StarRow({ filled }: { filled: number }) {
   return (
@@ -89,9 +91,35 @@ export default function ReviewsSection({ reviews }: { reviews: Review[] }) {
             >
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>
-                  <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm">
-                    {review.authorName}
-                  </p>
+                  {(() => {
+                    const user = getUserById(review.userId);
+                    const fullName = user ? `${user.firstName} ${user.lastName}` : "Anonymous";
+                    return (
+                      <>
+                        <Link
+                          href={`/profile/${review.userId}`}
+                          className="font-semibold text-slate-800 dark:text-slate-100 text-sm hover:text-blue-700 dark:hover:text-blue-400 transition"
+                        >
+                          {fullName}
+                        </Link>
+                        {user?.pilotCertificates && user.pilotCertificates.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {user.pilotCertificates.map((slug) => {
+                              const program = getProgramBySlug(slug);
+                              return (
+                                <span
+                                  key={slug}
+                                  className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded"
+                                >
+                                  {program?.shortName ?? slug}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                   <StarRow filled={review.rating} />
                 </div>
                 <span className="text-xs text-slate-400 dark:text-slate-500 shrink-0 mt-0.5">
