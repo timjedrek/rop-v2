@@ -67,7 +67,7 @@ export default async function ProgramDetailPage({ params }: Props) {
         <div className="max-w-4xl mx-auto">
           <Link
             href="/programs"
-            className="inline-flex items-center gap-1 text-slate-300 hover:text-white text-sm transition mb-4"
+            className="inline-flex items-center gap-1 text-slate-300 hover:text-white text-sm transition mb-4 pr-10"
           >
             <ChevronLeft size={16} />
             All Programs
