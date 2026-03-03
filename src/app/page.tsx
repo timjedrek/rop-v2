@@ -1,3 +1,5 @@
+import { SchoolCard } from "@/components/SchoolCard";
+
 export default function Home() {
   return (
     <div className="pb-20">
@@ -34,21 +36,12 @@ export default function Home() {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* 6 placeholder cards – we'll replace with real component soon */}
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="bg-white dark:bg-slate-900 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
-            >
-              <div className="h-48 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 " />
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-                  Example Flight School {i + 1}
-                </h3>
-                <p className="text-slate-600 dark:text-slate-400">City, State • 4.8 ★ (120+ reviews)</p>
-              </div>
-            </div>
-          ))}
+          <SchoolCard name="Arizona Pilot Academy" location="Mesa, AZ" />
+          <SchoolCard name="Midwest Flight Training" location="Belleville, IL" rating={4.6} reviewCount={89} />
+          <SchoolCard name="Suncoast Aviation" location="Pembroke Pines, FL" />
+          <SchoolCard name="St. Louis Flight Academy" location="St. Louis, MO" rating={4.9} />
+          <SchoolCard name="Heartland Flyers" location="Kansas City, MO" />
+          <SchoolCard name="Pacific Coast Flight School" location="San Diego, CA" rating={4.7} reviewCount={210} />
         </div>
       </section>
     </div>
