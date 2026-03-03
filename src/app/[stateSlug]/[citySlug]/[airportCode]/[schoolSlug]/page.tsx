@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronLeft, MapPin, Phone, Globe, Star, Plane } from "lucide-react";
+import { ChevronLeft, MapPin, Phone, Globe, Star, Plane, Users, Mail } from "lucide-react";
 import {
   flightSchools,
   getSchoolBySlug,
@@ -247,6 +247,99 @@ export default async function SchoolDetailPage({ params }: Props) {
               </div>
             </div>
           </section>
+
+          {/* Fleet & Staff */}
+          {(school.aircraft || school.estimatedPlanes || school.estimatedInstructors) && (
+            <section>
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">
+              Fleet &amp; Staff
+              </h2>
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl divide-y divide-slate-100 dark:divide-slate-800">
+              {/* Stats row */}
+              {(school.estimatedPlanes || school.estimatedInstructors) && (
+                <div className="grid grid-cols-2 divide-x divide-slate-100 dark:divide-slate-800">
+                {school.estimatedPlanes && (
+                  <div className="p-5 flex items-center gap-3">
+                  <Plane size={18} className="text-blue-600 dark:text-blue-400 shrink-0" />
+                  <div>
+                    <p className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                    {school.estimatedPlanes}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Estimated aircraft</p>
+                  </div>
+                  </div>
+                )}
+                {school.estimatedInstructors && (
+                  <div className="p-5 flex items-center gap-3">
+                  <Users size={18} className="text-blue-600 dark:text-blue-400 shrink-0" />
+                  <div>
+                    <p className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                    {school.estimatedInstructors}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Estimated instructors</p>
+                  </div>
+                  </div>
+                )}
+                </div>
+              )}
+              {/* Aircraft list */}
+              {school.aircraft && school.aircraft.length > 0 && (
+                <div className="p-5">
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3">
+                  Aircraft
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {school.aircraft.map((a) => (
+                  <span
+                    key={a}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-sm font-medium text-slate-700 dark:text-slate-300"
+                  >
+                    <Plane size={13} className="text-slate-400" />
+                    {a}
+                  </span>
+                  ))}
+                </div>
+                </div>
+              )}
+              </div>
+            </section>
+          )}
+
+          {/* Key Contacts */}
+          {school.contacts && school.contacts.length > 0 && (
+            <section>
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">
+                Key Contacts
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {school.contacts.map((contact) => (
+                  <div
+                    key={contact.email}
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5 space-y-2"
+                  >
+                    <p className="font-semibold text-slate-800 dark:text-slate-100">{contact.name}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{contact.title}</p>
+                    <div className="pt-1 space-y-1.5">
+                      <a
+                        href={`tel:${contact.phone.replace(/\D/g, "")}`}
+                        className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-400 transition"
+                      >
+                        <Phone size={14} className="text-slate-400 shrink-0" />
+                        {contact.phone}
+                      </a>
+                      <a
+                        href={`mailto:${contact.email}`}
+                        className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-400 transition"
+                      >
+                        <Mail size={14} className="text-slate-400 shrink-0" />
+                        {contact.email}
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Student Reviews */}
           <section>

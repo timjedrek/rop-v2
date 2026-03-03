@@ -30,6 +30,16 @@ export type Airport = {
   faaLid: string | null;
 };
 
+export type ContactPerson = {
+  name: string;
+  title: string;
+  phone: string;
+  email: string;
+};
+
+export type FleetRange =
+  | "1-3" | "3-6" | "6-9" | "10-20" | "20-30" | "30-40" | "40-50" | "50+";
+
 export type FlightSchool = {
   id: string;
   name: string;
@@ -51,6 +61,10 @@ export type FlightSchool = {
   phone: string;
   /** When true, the school appears in the Featured section on the home page */
   featured?: boolean;
+  contacts?: ContactPerson[];
+  aircraft?: string[];
+  estimatedPlanes?: FleetRange;
+  estimatedInstructors?: FleetRange;
 };
 
 export type Review = {

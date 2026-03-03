@@ -152,6 +152,14 @@ export const flightSchools: FlightSchool[] = [
     website: "https://example.com/arizona-pilot-academy",
     phone: "(480) 555-0101",
     featured: true,
+    aircraft: ["Cessna 172 Skyhawk", "Piper Cherokee", "Beechcraft Baron 58", "Cessna 182 Skylane"],
+    estimatedPlanes: "10-20",
+    estimatedInstructors: "10-20",
+    contacts: [
+      { name: "Robert Hale", title: "Owner / Chief Pilot", phone: "(480) 555-0101", email: "rhale@example.com" },
+      { name: "Maria Santos", title: "Director of Training", phone: "(480) 555-0103", email: "msantos@example.com" },
+      { name: "Kevin Park", title: "Front Desk / Scheduling", phone: "(480) 555-0104", email: "kpark@example.com" },
+    ],
   },
   {
     id: "arizona-pilot-academy-phoenix",
@@ -168,6 +176,13 @@ export const flightSchools: FlightSchool[] = [
     reviewCount: 58,
     website: "https://example.com/arizona-pilot-academy",
     phone: "(602) 555-0102",
+    aircraft: ["Cessna 172 Skyhawk", "Piper Cherokee", "Cessna 182 Skylane"],
+    estimatedPlanes: "6-9",
+    estimatedInstructors: "6-9",
+    contacts: [
+      { name: "Dana Cole", title: "Location Manager / CFI", phone: "(602) 555-0102", email: "dcole@example.com" },
+      { name: "Tina Ruiz", title: "Front Desk / Scheduling", phone: "(602) 555-0105", email: "truiz@example.com" },
+    ],
   },
 
   // ── Midwest Flight Training (single location) ──────────────────────────────
@@ -185,6 +200,13 @@ export const flightSchools: FlightSchool[] = [
     reviewCount: 89,
     website: "https://example.com/midwest-flight-training",
     phone: "(618) 555-0202",
+    aircraft: ["Cessna 172 Skyhawk", "Piper Cherokee", "Cessna 152"],
+    estimatedPlanes: "6-9",
+    estimatedInstructors: "3-6",
+    contacts: [
+      { name: "Gary Novak", title: "Owner / Chief Pilot", phone: "(618) 555-0202", email: "gnovak@example.com" },
+      { name: "Pam Weston", title: "Front Desk / Scheduling", phone: "(618) 555-0203", email: "pweston@example.com" },
+    ],
   },
 
   // ── Suncoast Aviation (single location) ───────────────────────────────────
@@ -203,6 +225,14 @@ export const flightSchools: FlightSchool[] = [
     website: "https://example.com/suncoast-aviation",
     phone: "(954) 555-0303",
     featured: true,
+    aircraft: ["Cessna 172 Skyhawk", "Cessna 182 Skylane", "Piper Seminole", "Beechcraft Baron 58", "Diamond DA20"],
+    estimatedPlanes: "20-30",
+    estimatedInstructors: "20-30",
+    contacts: [
+      { name: "Carlos Vega", title: "Owner", phone: "(954) 555-0303", email: "cvega@example.com" },
+      { name: "Angela Marsh", title: "Chief Pilot / Director of Training", phone: "(954) 555-0304", email: "amarsh@example.com" },
+      { name: "Jordan Lee", title: "Front Desk / Scheduling", phone: "(954) 555-0305", email: "jlee@example.com" },
+    ],
   },
 
   // ── St. Louis Flight Academy (single location) ────────────────────────────
@@ -221,6 +251,14 @@ export const flightSchools: FlightSchool[] = [
     website: "https://example.com/st-louis-flight-academy",
     phone: "(314) 555-0404",
     featured: true,
+    aircraft: ["Cessna 172 Skyhawk", "Piper Cherokee", "Piper Seminole", "Beechcraft Duchess"],
+    estimatedPlanes: "10-20",
+    estimatedInstructors: "10-20",
+    contacts: [
+      { name: "Thomas Ellery", title: "Owner / Chief Pilot", phone: "(314) 555-0404", email: "tellery@example.com" },
+      { name: "Rachel Burns", title: "Director of Training", phone: "(314) 555-0405", email: "rburns@example.com" },
+      { name: "Neil Cho", title: "Front Desk / Scheduling", phone: "(314) 555-0406", email: "ncho@example.com" },
+    ],
   },
 
   // ── Heartland Flyers (2 locations) ────────────────────────────────────────
@@ -240,6 +278,14 @@ export const flightSchools: FlightSchool[] = [
     website: "https://example.com/heartland-flyers",
     phone: "(816) 555-0505",
     featured: true,
+    aircraft: ["Cessna 172 Skyhawk", "Cessna 152", "Piper Cherokee", "Van's RV-12"],
+    estimatedPlanes: "10-20",
+    estimatedInstructors: "10-20",
+    contacts: [
+      { name: "Frank Briggs", title: "Owner / Founder", phone: "(816) 555-0505", email: "fbriggs@example.com" },
+      { name: "Donna Pierce", title: "Chief Pilot", phone: "(816) 555-0507", email: "dpierce@example.com" },
+      { name: "Sam Okafor", title: "Front Desk / Scheduling", phone: "(816) 555-0508", email: "sokafor@example.com" },
+    ],
   },
   {
     id: "heartland-flyers-overland-park",
@@ -256,6 +302,13 @@ export const flightSchools: FlightSchool[] = [
     reviewCount: 61,
     website: "https://example.com/heartland-flyers",
     phone: "(913) 555-0506",
+    aircraft: ["Cessna 172 Skyhawk", "Piper Cherokee", "Van's RV-12"],
+    estimatedPlanes: "6-9",
+    estimatedInstructors: "6-9",
+    contacts: [
+      { name: "Casey Tran", title: "Location Manager / CFI", phone: "(913) 555-0506", email: "ctran@example.com" },
+      { name: "Bria Owens", title: "Front Desk / Scheduling", phone: "(913) 555-0509", email: "bowens@example.com" },
+    ],
   },
 
   // ── Pacific Coast Flight School (single location) ─────────────────────────
@@ -274,6 +327,14 @@ export const flightSchools: FlightSchool[] = [
     website: "https://example.com/pacific-coast-flight-school",
     phone: "(619) 555-0606",
     featured: true,
+    aircraft: ["Cessna 172 Skyhawk", "Cessna 182 Skylane", "Piper Cherokee", "Robinson R-44", "Diamond DA40"],
+    estimatedPlanes: "20-30",
+    estimatedInstructors: "20-30",
+    contacts: [
+      { name: "Linda Hayashi", title: "Owner / Chief Pilot", phone: "(619) 555-0606", email: "lhayashi@example.com" },
+      { name: "Greg Fontaine", title: "Director of Training", phone: "(619) 555-0607", email: "gfontaine@example.com" },
+      { name: "Maya Torres", title: "Front Desk / Scheduling", phone: "(619) 555-0608", email: "mtorres@example.com" },
+    ],
   },
 
   // ── Phoenix Flight Academy (single location) ──────────────────────────────
