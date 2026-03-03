@@ -1,4 +1,4 @@
-import type { State, City, Airport, FlightSchool } from "./types";
+import type { State, City, Airport, FlightSchool, Review } from "./types";
 
 // ── States (all 50) ────────────────────────────────────────────────────────────
 // schoolCount / airportCount are denormalized display values.
@@ -396,4 +396,30 @@ export function getRelatedSchools(school: FlightSchool): FlightSchool[] {
   return flightSchools.filter(
     (s) => s.organizationId === school.organizationId && s.id !== school.id,
   );
+}
+
+// ── Reviews ────────────────────────────────────────────────────────────────────
+export const reviews: Review[] = [
+  // arizona-pilot-academy-mesa
+  { id: "r1",  schoolId: "arizona-pilot-academy-mesa",  rating: 5, authorName: "Jake M.",   createdAt: "2025-11-10", body: "Excellent instructors and a modern fleet. Got my PPL in 8 months — highly recommend." },
+  { id: "r2",  schoolId: "arizona-pilot-academy-mesa",  rating: 5, authorName: "Sara T.",   createdAt: "2025-09-22", body: "Great environment for learning. Scheduling is easy and their DPE first-time pass rate speaks for itself." },
+  { id: "r3",  schoolId: "arizona-pilot-academy-mesa",  rating: 4, authorName: "Carlos R.", createdAt: "2025-07-05", body: "Good school overall. Planes are well-maintained. Wish ground school was a bit more structured." },
+  { id: "r4",  schoolId: "arizona-pilot-academy-mesa",  rating: 5, authorName: "Aisha K.",  createdAt: "2025-04-17", body: "Did my instrument rating here after training elsewhere — night and day difference in instruction quality." },
+  // suncoast-aviation
+  { id: "r5",  schoolId: "suncoast-aviation",           rating: 5, authorName: "Mike D.",   createdAt: "2025-12-01", body: "Year-round VFR makes training incredibly efficient. Finished my commercial in under 14 months." },
+  { id: "r6",  schoolId: "suncoast-aviation",           rating: 5, authorName: "Priya N.",  createdAt: "2025-10-14", body: "The ATP pipeline here is top-notch. Several instructors are current airline pilots, which is invaluable." },
+  { id: "r7",  schoolId: "suncoast-aviation",           rating: 4, authorName: "Tom W.",    createdAt: "2025-08-30", body: "Solid school. Busy ramp can delay flights during peak season but it's manageable." },
+  // pacific-coast-flight-school
+  { id: "r8",  schoolId: "pacific-coast-flight-school", rating: 5, authorName: "Lisa C.",   createdAt: "2026-01-08", body: "Training over the San Diego coast is breathtaking. The seaplane add-on is a bucket-list experience." },
+  { id: "r9",  schoolId: "pacific-coast-flight-school", rating: 4, authorName: "Omar F.",   createdAt: "2025-11-30", body: "Great instructors and facilities. Worth every penny for the training environment alone." },
+  // st-louis-flight-academy
+  { id: "r10", schoolId: "st-louis-flight-academy",     rating: 5, authorName: "Beth H.",   createdAt: "2026-02-12", body: "Best flight school in the Midwest. Very professional operation from front desk all the way through checkrides." },
+  { id: "r11", schoolId: "st-louis-flight-academy",     rating: 5, authorName: "Dave P.",   createdAt: "2025-12-19", body: "Knocked out my commercial multi-engine add-on in record time using their ATP prep track." },
+  // heartland-flyers-kc
+  { id: "r12", schoolId: "heartland-flyers-kc",         rating: 5, authorName: "Hannah L.", createdAt: "2025-10-03", body: "20 years of reputation for a reason. Instructors are patient and incredibly thorough." },
+  { id: "r13", schoolId: "heartland-flyers-kc",         rating: 4, authorName: "Raj S.",    createdAt: "2025-09-11", body: "Good training and loved the downtown airport location. Easy commute from the city." },
+];
+
+export function getReviewsBySchool(schoolId: string): Review[] {
+  return reviews.filter((r) => r.schoolId === schoolId);
 }

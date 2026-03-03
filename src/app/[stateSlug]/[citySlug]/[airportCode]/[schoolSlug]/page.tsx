@@ -9,7 +9,10 @@ import {
   getStateBySlug,
   getAirportByCode,
   getRelatedSchools,
+  getReviewsBySchool,
 } from "@/lib/mock-data";
+import ReviewsSection from "@/components/ReviewsSection";
+import ReviewForm from "@/components/ReviewForm";
 
 type Props = {
   params: Promise<{
@@ -49,6 +52,8 @@ export default async function SchoolDetailPage({ params }: Props) {
   const city = getCityBySlug(school.citySlug);
   const state = getStateBySlug(school.stateSlug);
   const primaryAirport = getAirportByCode(school.primaryAirportCode);
+
+  const schoolReviews = getReviewsBySchool(school.id);
 
   // Resolve sibling listings for the same brand
   const relatedSchools = getRelatedSchools(school).map((s) => ({
@@ -241,6 +246,22 @@ export default async function SchoolDetailPage({ params }: Props) {
                 </div>
               </div>
             </div>
+          </section>
+
+          {/* Student Reviews */}
+          <section>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">
+              Student Reviews
+            </h2>
+            <ReviewsSection reviews={schoolReviews} />
+          </section>
+
+          {/* Write a Review */}
+          <section>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">
+              Write a Review
+            </h2>
+            <ReviewForm schoolId={school.id} />
           </section>
 
           {/* Other locations — sibling listings for the same brand */}
