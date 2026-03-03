@@ -1,6 +1,11 @@
+import Link from "next/link";
 import { SchoolCard } from "@/components/SchoolCard";
+import { getFeaturedSchools, getCityBySlug, getStateBySlug } from "@/lib/mock-data";
+import { schoolHref } from "@/lib/utils";
 
 export default function Home() {
+  const featuredSchools = getFeaturedSchools();
+
   return (
     <div className="pb-20">
       {/* Hero section */}
@@ -29,19 +34,38 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured schools placeholder */}
+      {/* Featured schools */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-rose-800 dark:text-rose-700">
-          Featured Flight Schools
-        </h2>
+        <div className="flex items-center justify-between mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-rose-800 dark:text-rose-700">
+            Featured Flight Schools
+          </h2>
+          <Link
+            href="/featured"
+            className="text-sm font-semibold text-blue-700 dark:text-blue-400 hover:underline"
+          >
+            View all →
+          </Link>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <SchoolCard name="Arizona Pilot Academy" location="Mesa, AZ" />
-          <SchoolCard name="Midwest Flight Training" location="Belleville, IL" rating={4.6} reviewCount={89} />
-          <SchoolCard name="Suncoast Aviation" location="Pembroke Pines, FL" />
-          <SchoolCard name="St. Louis Flight Academy" location="St. Louis, MO" rating={4.9} />
-          <SchoolCard name="Heartland Flyers" location="Kansas City, MO" />
-          <SchoolCard name="Pacific Coast Flight School" location="San Diego, CA" rating={4.7} reviewCount={210} />
+          {featuredSchools.map((school) => {
+            const city = getCityBySlug(school.citySlug);
+            const state = getStateBySlug(school.stateSlug);
+            const location = city && state
+              ? `${city.name}, ${state.abbreviation}`
+              : school.citySlug;
+            return (
+              <SchoolCard
+                key={school.id}
+                name={school.name}
+                location={location}
+                rating={school.rating}
+                reviewCount={school.reviewCount}
+                href={schoolHref(school)}
+              />
+            );
+          })}
         </div>
       </section>
       {/* Why Create an Account */}

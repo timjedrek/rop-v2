@@ -1,3 +1,10 @@
+import type { FlightSchool } from "./types";
+
+/** Build the deep-nested URL for a school detail page */
+export function schoolHref(school: FlightSchool): string {
+  return `/${school.stateSlug}/${school.citySlug}/${school.primaryAirportCode.toLowerCase()}/${school.slug}`;
+}
+
 /** Convert a display string to a URL slug: "Arizona Pilot Academy" → "arizona-pilot-academy" */
 export function slugify(str: string): string {
   return str

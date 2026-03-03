@@ -49,6 +49,8 @@ export type FlightSchool = {
   reviewCount: number;
   website: string;
   phone: string;
+  /** When true, the school appears in the Featured section on the home page */
+  featured?: boolean;
 };
 
 export type Review = {

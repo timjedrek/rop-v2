@@ -151,6 +151,7 @@ export const flightSchools: FlightSchool[] = [
     reviewCount: 142,
     website: "https://example.com/arizona-pilot-academy",
     phone: "(480) 555-0101",
+    featured: true,
   },
   {
     id: "arizona-pilot-academy-phoenix",
@@ -201,6 +202,7 @@ export const flightSchools: FlightSchool[] = [
     reviewCount: 142,
     website: "https://example.com/suncoast-aviation",
     phone: "(954) 555-0303",
+    featured: true,
   },
 
   // ── St. Louis Flight Academy (single location) ────────────────────────────
@@ -218,6 +220,7 @@ export const flightSchools: FlightSchool[] = [
     reviewCount: 67,
     website: "https://example.com/st-louis-flight-academy",
     phone: "(314) 555-0404",
+    featured: true,
   },
 
   // ── Heartland Flyers (2 locations) ────────────────────────────────────────
@@ -236,6 +239,7 @@ export const flightSchools: FlightSchool[] = [
     reviewCount: 142,
     website: "https://example.com/heartland-flyers",
     phone: "(816) 555-0505",
+    featured: true,
   },
   {
     id: "heartland-flyers-overland-park",
@@ -269,6 +273,7 @@ export const flightSchools: FlightSchool[] = [
     reviewCount: 210,
     website: "https://example.com/pacific-coast-flight-school",
     phone: "(619) 555-0606",
+    featured: true,
   },
 
   // ── Phoenix Flight Academy (single location) ──────────────────────────────
@@ -286,6 +291,7 @@ export const flightSchools: FlightSchool[] = [
     reviewCount: 98,
     website: "https://example.com/phoenix-flight-academy",
     phone: "(602) 555-0707",
+    featured: true,
   },
 
   // ── Tennessee Flight Training (2 locations) ───────────────────────────────
@@ -368,6 +374,10 @@ export function getSchoolsByCity(citySlug: string): FlightSchool[] {
 export function getSchoolsByAirport(icao: string): FlightSchool[] {
   const upper = icao.toUpperCase();
   return flightSchools.filter((s) => s.primaryAirportCode === upper);
+}
+
+export function getFeaturedSchools(): FlightSchool[] {
+  return flightSchools.filter((s) => s.featured);
 }
 
 /** Returns all sibling listings for the same brand (excludes the given school itself) */
