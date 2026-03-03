@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { MapPin, Star, SlidersHorizontal, X } from "lucide-react";
+import { MapPin, Star, SlidersHorizontal, X, ArrowUp, ArrowDown } from "lucide-react";
 
 const PAGE_SIZE = 12;
 
@@ -154,6 +154,10 @@ export function AdvancedSearchExplorer({ schools, programs, aircraft, states, ci
   const [faaPart, setFaaPart] = useState<"any" | "61" | "141" | "both">("any");
   const [minRating, setMinRating] = useState(0);
 
+  // Sort
+  const [sortBy, setSortBy] = useState<"name" | "rating">("rating");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
   // Pagination + mobile
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -276,8 +280,17 @@ export function AdvancedSearchExplorer({ schools, programs, aircraft, states, ci
     setVisibleCount(PAGE_SIZE);
   };
 
-  const visible = filtered.slice(0, visibleCount);
-  const hasMore = visibleCount < filtered.length;
+  const sorted = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      const cmp = sortBy === "name"
+        ? a.name.localeCompare(b.name)
+        : a.rating - b.rating;
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+  }, [filtered, sortBy, sortDir]);
+
+  const visible = sorted.slice(0, visibleCount);
+  const hasMore = visibleCount < sorted.length;
 
   // ── Filter panel ─────────────────────────────────────────────────────────────
   const filterPanel = (
@@ -520,6 +533,34 @@ export function AdvancedSearchExplorer({ schools, programs, aircraft, states, ci
               </span>{" "}
               school{filtered.length !== 1 ? "s" : ""} found
             </p>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-slate-500 dark:text-slate-400 mr-1">Sort:</span>
+              {(["name", "rating"] as const).map((field) => {
+                const active = sortBy === field;
+                return (
+                  <button
+                    key={field}
+                    onClick={() => {
+                      if (active) {
+                        setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+                      } else {
+                        setSortBy(field);
+                        setSortDir(field === "rating" ? "desc" : "asc");
+                      }
+                      resetCount();
+                    }}
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium border transition ${
+                      active
+                        ? "bg-blue-700 text-white border-blue-700"
+                        : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500"
+                    }`}
+                  >
+                    {field === "name" ? "Name" : "Rating"}
+                    {active && (sortDir === "asc" ? <ArrowUp size={11} /> : <ArrowDown size={11} />)}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {filtered.length === 0 ? (
