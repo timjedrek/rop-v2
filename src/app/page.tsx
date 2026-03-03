@@ -1,7 +1,27 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SchoolCard } from "@/components/SchoolCard";
 import { getFeaturedSchools, getCityBySlug, getStateBySlug } from "@/lib/mock-data";
 import { schoolHref } from "@/lib/utils";
+
+export const metadata: Metadata = {
+  title: "Flight School Finder – Find Pilot Training Schools Across the USA",
+  description:
+    "Find flight schools by city, state, airport, or school name. Compare ratings, programs, and contact info for pilot training across the USA.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Flight School Finder – Find Pilot Training Schools Across the USA",
+    description:
+      "Find flight schools by city, state, airport, or school name. Compare ratings, programs, and contact info for pilot training across the USA.",
+    url: "/",
+    type: "website",
+  },
+  twitter: {
+    title: "Flight School Finder – Find Pilot Training Schools Across the USA",
+    description:
+      "Find flight schools by city, state, airport, or school name.",
+  },
+};
 
 export default function Home() {
   const featuredSchools = getFeaturedSchools();

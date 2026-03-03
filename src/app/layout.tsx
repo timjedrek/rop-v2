@@ -6,14 +6,27 @@ import { Navbar } from "@/components/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000");
+
 // Better shared defaults (will be overridden by pages when needed)
 export const metadata: Metadata = {
   title: {
     default: "Flight School Finder - Find Pilot Training Centers Across the USA",
-    template: "%s | Flight School Directory", // pages can set just "Mesa Flight Schools" → becomes that + suffix
+    template: "%s | Flight School Finder",
   },
-  description: "Find FAA-certified flight schools by city, state, airport or name.",
-  metadataBase: new URL("http://localhost:3000"), // change to your real domain later
+  description: "Find flight schools by city, state, airport or name.",
+  metadataBase: new URL(BASE_URL),
+  openGraph: {
+    siteName: "Flight School Finder",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+  },
 };
 
 export default function RootLayout({

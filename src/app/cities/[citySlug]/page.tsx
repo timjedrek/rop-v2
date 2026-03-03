@@ -20,9 +20,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const state = getStateBySlug(city.stateSlug);
   const schools = getSchoolsByCity(citySlug);
   const airports = getAirportsByCity(citySlug);
+  const title = `Flight Schools in ${city.name}, ${city.stateAbbreviation}`;
+  const description = `Find flight schools in ${city.name}, ${state?.name ?? city.stateAbbreviation}. Browse ${schools.length} schools across ${airports.length} airports.`;
   return {
-    title: `Flight Schools in ${city.name}, ${city.stateAbbreviation}`,
-    description: `Find FAA-certified flight schools in ${city.name}, ${state?.name ?? city.stateAbbreviation}. Browse ${schools.length} schools across ${airports.length} airports.`,
+    title,
+    description,
+    alternates: { canonical: `/cities/${citySlug}` },
+    openGraph: { title, description, url: `/cities/${citySlug}`, type: "website" },
+    twitter: { title, description },
   };
 }
 
@@ -44,7 +49,25 @@ export default async function CityDetailPage({ params }: Props) {
     .map((slug) => getCityBySlug(slug))
     .filter((c): c is NonNullable<typeof c> => c !== undefined);
 
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `Flight Schools in ${city.name}, ${city.stateAbbreviation}`,
+    numberOfItems: citySchools.length,
+    itemListElement: citySchools.map((school, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: school.name,
+      url: `/${school.stateSlug}/${school.citySlug}/${school.primaryAirportCode.toLowerCase()}/${school.slug}`,
+    })),
+  };
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
     <div className="pb-20">
       {/* Hero */}
       <section className="bg-gradient-to-br from-blue-950 to-slate-700 text-white py-16 px-4">
@@ -188,5 +211,6 @@ export default async function CityDetailPage({ params }: Props) {
         </section>
       </div>
     </div>
+    </>
   );
 }

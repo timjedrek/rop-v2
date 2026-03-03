@@ -10,6 +10,8 @@ import {
   getAirportByCode,
   getRelatedSchools,
   getReviewsBySchool,
+  getProgramsBySchool,
+  getAircraftBySchool,
 } from "@/lib/mock-data";
 import ReviewsSection from "@/components/ReviewsSection";
 import ReviewForm from "@/components/ReviewForm";
@@ -24,14 +26,20 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { schoolSlug } = await params;
+  const { schoolSlug, stateSlug, citySlug, airportCode } = await params;
   const school = getSchoolBySlug(schoolSlug);
   if (!school) return { title: "School Not Found" };
   const city = getCityBySlug(school.citySlug);
   const state = getStateBySlug(school.stateSlug);
+  const title = `${school.name} – Flight School in ${city?.name ?? ""}, ${state?.abbreviation ?? ""}`;
+  const description = school.description.slice(0, 160);
+  const canonical = `/${stateSlug}/${citySlug}/${airportCode}/${schoolSlug}`;
   return {
-    title: `${school.name} – Flight School in ${city?.name ?? ""}, ${state?.abbreviation ?? ""}`,
-    description: school.description.slice(0, 160),
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: { title, description, url: canonical, type: "website" },
+    twitter: { title, description },
   };
 }
 
@@ -54,6 +62,8 @@ export default async function SchoolDetailPage({ params }: Props) {
   const primaryAirport = getAirportByCode(school.primaryAirportCode);
 
   const schoolReviews = getReviewsBySchool(school.id);
+  const schoolPrograms = getProgramsBySchool(school);
+  const schoolAircraft = getAircraftBySchool(school);
 
   // Resolve sibling listings for the same brand
   const relatedSchools = getRelatedSchools(school).map((s) => ({
@@ -62,6 +72,34 @@ export default async function SchoolDetailPage({ params }: Props) {
     city: getCityBySlug(s.citySlug),
     state: getStateBySlug(s.stateSlug),
   }));
+
+  // JSON-LD BreadcrumbList structured data
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "/" },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: `${state?.name ?? school.stateSlug} Flight Schools`,
+        item: `/states/${school.stateSlug}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: `${city?.name ?? school.citySlug} Flight Schools`,
+        item: `/cities/${school.citySlug}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 4,
+        name: `${primaryAirport?.icao ?? school.primaryAirportCode} Flight Schools`,
+        item: `/airports/${school.primaryAirportCode.toLowerCase()}`,
+      },
+      { "@type": "ListItem", position: 5, name: school.name },
+    ],
+  };
 
   // JSON-LD LocalBusiness structured data
   const jsonLd = {
@@ -89,6 +127,10 @@ export default async function SchoolDetailPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
       <div className="pb-20">
@@ -124,6 +166,11 @@ export default async function SchoolDetailPage({ params }: Props) {
                   {primaryAirport.icao}
                 </Link>
               )}
+              {school.faaPart && (
+                <span className="bg-white/10 border border-white/20 rounded-full px-2.5 py-0.5 text-xs font-medium">
+                  FAR Part {school.faaPart === "both" ? "61 / 141" : school.faaPart}
+                </span>
+              )}
             </div>
 
             {/* Rating */}
@@ -153,13 +200,14 @@ export default async function SchoolDetailPage({ params }: Props) {
               Programs Offered
             </h2>
             <div className="flex flex-wrap gap-2">
-              {school.programs.map((program) => (
-                <span
-                  key={program}
-                  className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-700 rounded-full text-sm font-medium"
+              {schoolPrograms.map((program) => (
+                <Link
+                  key={program.slug}
+                  href={`/programs/${program.slug}`}
+                  className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-700 rounded-full text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:border-blue-400 transition"
                 >
-                  {program}
-                </span>
+                  {program.shortName}
+                </Link>
               ))}
             </div>
           </section>
@@ -249,58 +297,59 @@ export default async function SchoolDetailPage({ params }: Props) {
           </section>
 
           {/* Fleet & Staff */}
-          {(school.aircraft || school.estimatedPlanes || school.estimatedInstructors) && (
+          {(schoolAircraft.length > 0 || school.estimatedPlanes || school.estimatedInstructors) && (
             <section>
               <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">
-              Fleet &amp; Staff
+                Fleet &amp; Staff
               </h2>
               <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl divide-y divide-slate-100 dark:divide-slate-800">
-              {/* Stats row */}
-              {(school.estimatedPlanes || school.estimatedInstructors) && (
-                <div className="grid grid-cols-2 divide-x divide-slate-100 dark:divide-slate-800">
-                {school.estimatedPlanes && (
-                  <div className="p-5 flex items-center gap-3">
-                  <Plane size={18} className="text-blue-600 dark:text-blue-400 shrink-0" />
-                  <div>
-                    <p className="text-xl font-bold text-slate-800 dark:text-slate-100">
-                    {school.estimatedPlanes}
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Estimated aircraft</p>
-                  </div>
+                {/* Stats row */}
+                {(school.estimatedPlanes || school.estimatedInstructors) && (
+                  <div className="grid grid-cols-2 divide-x divide-slate-100 dark:divide-slate-800">
+                    {school.estimatedPlanes && (
+                      <div className="p-5 flex items-center gap-3">
+                        <Plane size={18} className="text-blue-600 dark:text-blue-400 shrink-0" />
+                        <div>
+                          <p className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                            {school.estimatedPlanes}
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Estimated aircraft</p>
+                        </div>
+                      </div>
+                    )}
+                    {school.estimatedInstructors && (
+                      <div className="p-5 flex items-center gap-3">
+                        <Users size={18} className="text-blue-600 dark:text-blue-400 shrink-0" />
+                        <div>
+                          <p className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                            {school.estimatedInstructors}
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Estimated instructors</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
-                {school.estimatedInstructors && (
-                  <div className="p-5 flex items-center gap-3">
-                  <Users size={18} className="text-blue-600 dark:text-blue-400 shrink-0" />
-                  <div>
-                    <p className="text-xl font-bold text-slate-800 dark:text-slate-100">
-                    {school.estimatedInstructors}
+                {/* Aircraft list */}
+                {schoolAircraft.length > 0 && (
+                  <div className="p-5">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3">
+                      Aircraft
                     </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Estimated instructors</p>
-                  </div>
+                    <div className="flex flex-wrap gap-2">
+                      {schoolAircraft.map((a) => (
+                        <Link
+                          key={a.slug}
+                          href={`/aircraft/${a.slug}`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-slate-400 transition"
+                        >
+                          <Plane size={13} className="text-slate-400" />
+                          {a.displayName}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 )}
-                </div>
-              )}
-              {/* Aircraft list */}
-              {school.aircraft && school.aircraft.length > 0 && (
-                <div className="p-5">
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3">
-                  Aircraft
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {school.aircraft.map((a) => (
-                  <span
-                    key={a}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-sm font-medium text-slate-700 dark:text-slate-300"
-                  >
-                    <Plane size={13} className="text-slate-400" />
-                    {a}
-                  </span>
-                  ))}
-                </div>
-                </div>
-              )}
               </div>
             </section>
           )}

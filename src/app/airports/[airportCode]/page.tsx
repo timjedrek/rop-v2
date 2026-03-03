@@ -20,9 +20,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const city = getCityBySlug(airport.citySlug);
   const state = getStateBySlug(airport.stateSlug);
   const schools = getSchoolsByAirport(airport.icao);
+  const fallbackDesc = `Find ${schools.length} flight school${schools.length !== 1 ? "s" : ""} at ${airport.name} (${airport.icao}) in ${city?.name ?? ""}, ${state?.name ?? ""}.`;
+  const description = airport.description
+    ? airport.description.slice(0, 160)
+    : fallbackDesc;
+  const title = `Flight Schools at ${airport.icao} – ${airport.name}`;
   return {
-    title: `Flight Schools at ${airport.icao} – ${airport.name}`,
-    description: `Find ${schools.length} FAA-certified flight school${schools.length !== 1 ? "s" : ""} at ${airport.name} (${airport.icao}) in ${city?.name ?? ""}, ${state?.name ?? ""}.`,
+    title,
+    description,
+    alternates: { canonical: `/airports/${airport.icao.toLowerCase()}` },
+    openGraph: { title, description, url: `/airports/${airport.icao.toLowerCase()}`, type: "website" },
+    twitter: { title, description },
   };
 }
 
@@ -39,7 +47,25 @@ export default async function AirportDetailPage({ params }: Props) {
   const state = getStateBySlug(airport.stateSlug);
   const schools = getSchoolsByAirport(airport.icao);
 
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `Flight Schools at ${airport.icao} – ${airport.name}`,
+    numberOfItems: schools.length,
+    itemListElement: schools.map((school, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: school.name,
+      url: `/${school.stateSlug}/${school.citySlug}/${school.primaryAirportCode.toLowerCase()}/${school.slug}`,
+    })),
+  };
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
     <div className="pb-20">
       {/* Hero */}
       <section className="bg-gradient-to-br from-blue-950 to-slate-700 text-white py-16 px-4">
@@ -169,5 +195,6 @@ export default async function AirportDetailPage({ params }: Props) {
         )}
       </div>
     </div>
+    </>
   );
 }

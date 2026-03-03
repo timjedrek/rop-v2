@@ -8,6 +8,19 @@ export const metadata: Metadata = {
   title: "Top Rated Flight Schools – Flight School Finder",
   description:
     "Discover the highest-rated flight schools in the USA. Ranked by student reviews and ratings for Private Pilot, Instrument, Commercial, CFI, and ATP training.",
+  alternates: { canonical: "/top-rated" },
+  openGraph: {
+    title: "Top Rated Flight Schools – Flight School Finder",
+    description:
+      "Discover the highest-rated flight schools in the USA. Ranked by student reviews and ratings for Private Pilot, Instrument, Commercial, CFI, and ATP training.",
+    url: "/top-rated",
+    type: "website",
+  },
+  twitter: {
+    title: "Top Rated Flight Schools – Flight School Finder",
+    description:
+      "Discover the highest-rated flight schools in the USA. Ranked by student reviews and ratings for Private Pilot, Instrument, Commercial, CFI, and ATP training.",
+  },
 };
 
 export default function TopRatedPage() {

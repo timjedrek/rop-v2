@@ -18,9 +18,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { stateSlug } = await params;
   const state = getStateBySlug(stateSlug);
   if (!state) return { title: "State Not Found" };
+  const title = `Flight Schools in ${state.name}`;
+  const description = `Find flight schools in ${state.name}. Browse ${state.schoolCount} schools across ${state.airportCount} airports.`;
   return {
-    title: `Flight Schools in ${state.name}`,
-    description: `Find FAA-certified flight schools in ${state.name}. Browse ${state.schoolCount} schools across ${state.airportCount} airports.`,
+    title,
+    description,
+    alternates: { canonical: `/states/${stateSlug}` },
+    openGraph: { title, description, url: `/states/${stateSlug}`, type: "website" },
+    twitter: { title, description },
   };
 }
 
@@ -37,7 +42,25 @@ export default async function StateDetailPage({ params }: Props) {
   const stateAirports = getAirportsByState(stateSlug);
   const stateSchools = getSchoolsByState(stateSlug);
 
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `Flight Schools in ${state.name}`,
+    numberOfItems: stateSchools.length,
+    itemListElement: stateSchools.map((school, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: school.name,
+      url: `/${school.stateSlug}/${school.citySlug}/${school.primaryAirportCode.toLowerCase()}/${school.slug}`,
+    })),
+  };
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
     <div className="pb-20">
       {/* Hero */}
       <section className="bg-gradient-to-br from-blue-950 to-slate-700 text-white py-16 px-4">
@@ -177,5 +200,6 @@ export default async function StateDetailPage({ params }: Props) {
         </section>
       </div>
     </div>
+    </>
   );
 }

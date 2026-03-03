@@ -5,7 +5,20 @@ import { AirportsExplorer, type AirportRow } from "@/components/AirportsExplorer
 export const metadata: Metadata = {
   title: "Browse Flight Schools by Airport",
   description:
-    "Find FAA-certified flight schools at airports across the USA. Search by ICAO, IATA, or FAA identifier to discover pilot training near you.",
+    "Find flight schools at airports across the USA. Search by ICAO, IATA, or FAA identifier to discover pilot training near you.",
+  alternates: { canonical: "/airports" },
+  openGraph: {
+    title: "Browse Flight Schools by Airport",
+    description:
+      "Find flight schools at airports across the USA. Search by ICAO, IATA, or FAA identifier to discover pilot training near you.",
+    url: "/airports",
+    type: "website",
+  },
+  twitter: {
+    title: "Browse Flight Schools by Airport",
+    description:
+      "Find flight schools at airports across the USA. Search by ICAO, IATA, or FAA identifier to discover pilot training near you.",
+  },
 };
 
 export default function AirportsPage() {

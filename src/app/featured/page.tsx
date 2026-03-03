@@ -7,6 +7,19 @@ export const metadata: Metadata = {
   title: "Featured Flight Schools – Flight School Finder",
   description:
     "Explore our hand-picked featured flight schools across the USA. Top-rated programs for Private Pilot, Instrument, Commercial, CFI, and ATP certifications.",
+  alternates: { canonical: "/featured" },
+  openGraph: {
+    title: "Featured Flight Schools – Flight School Finder",
+    description:
+      "Explore our hand-picked featured flight schools across the USA. Top-rated programs for Private Pilot, Instrument, Commercial, CFI, and ATP certifications.",
+    url: "/featured",
+    type: "website",
+  },
+  twitter: {
+    title: "Featured Flight Schools – Flight School Finder",
+    description:
+      "Explore our hand-picked featured flight schools across the USA. Top-rated programs for Private Pilot, Instrument, Commercial, CFI, and ATP certifications.",
+  },
 };
 
 export default function FeaturedSchoolsPage() {
