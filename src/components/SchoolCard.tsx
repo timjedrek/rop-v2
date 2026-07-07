@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Plane, Star } from "lucide-react";
+import { ArrowRight, MapPin, Plane, Star } from "lucide-react";
 
 type SchoolCardProps = {
   name: string;
@@ -26,7 +26,7 @@ export function SchoolCard({
       >
         <Plane
           size={52}
-          className="text-blue-400/30 dark:text-blue-400/20 rotate-12"
+          className="text-blue-400/30 dark:text-blue-400/20 rotate-12 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
         />
       </div>
 
@@ -48,8 +48,12 @@ export function SchoolCard({
               ({reviewCount})
             </span>
           </div>
-          <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">
-            View →
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
+            View
+            <ArrowRight
+              size={12}
+              className="transition-transform duration-300 group-hover:translate-x-0.5"
+            />
           </span>
         </div>
       </div>
@@ -57,7 +61,7 @@ export function SchoolCard({
   );
 
   const cls =
-    "bg-white dark:bg-zinc-900 rounded-2xl shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 dark:border-zinc-800 block";
+    "group bg-white dark:bg-zinc-900 rounded-2xl shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 hover:border-blue-200 dark:hover:border-blue-900 transition-all duration-300 border border-slate-100 dark:border-zinc-800 block";
 
   if (href) {
     return (
