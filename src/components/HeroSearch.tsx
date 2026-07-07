@@ -1,15 +1,28 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Search, MapPin, Plane } from "lucide-react";
-import {
-  flightSchools,
-  airports,
-  getCityBySlug,
-  getStateBySlug,
-} from "@/lib/mock-data";
-import { schoolHref } from "@/lib/utils";
+
+export type SchoolSearchItem = {
+  id: string;
+  name: string;
+  location: string;
+  href: string;
+  airport: string;
+  stateName: string;
+  stateAbbreviation: string;
+};
+
+export type AirportSearchItem = {
+  id: string;
+  code: string;
+  iata: string | null;
+  faaLid: string | null;
+  name: string;
+  location: string;
+  href: string;
+};
 
 type Result =
   | {
@@ -29,46 +42,39 @@ type Result =
       href: string;
     };
 
-function search(q: string): Result[] {
+function search(
+  q: string,
+  schools: SchoolSearchItem[],
+  airports: AirportSearchItem[],
+): Result[] {
   const needle = q.toLowerCase().trim();
   if (!needle) return [];
 
   const results: Result[] = [];
 
-  for (const school of flightSchools) {
-    const city = getCityBySlug(school.citySlug);
-    const state = getStateBySlug(school.stateSlug);
-    const location =
-      city && state ? `${city.name}, ${state.abbreviation}` : school.citySlug;
-
+  for (const school of schools) {
     const hit =
       school.name.toLowerCase().includes(needle) ||
-      school.primaryAirportCode.toLowerCase().includes(needle) ||
-      location.toLowerCase().includes(needle) ||
-      (city?.name.toLowerCase().includes(needle) ?? false) ||
-      (state?.name.toLowerCase().includes(needle) ?? false) ||
-      state?.abbreviation.toLowerCase() === needle;
+      school.airport.toLowerCase().includes(needle) ||
+      school.location.toLowerCase().includes(needle) ||
+      school.stateName.toLowerCase().includes(needle) ||
+      school.stateAbbreviation.toLowerCase() === needle;
 
     if (hit) {
       results.push({
         kind: "school",
         id: school.id,
         name: school.name,
-        location,
-        href: schoolHref(school),
-        airport: school.primaryAirportCode,
+        location: school.location,
+        href: school.href,
+        airport: school.airport,
       });
     }
   }
 
   for (const airport of airports) {
-    const city = getCityBySlug(airport.citySlug);
-    const state = getStateBySlug(airport.stateSlug);
-    const location =
-      city && state ? `${city.name}, ${state.abbreviation}` : airport.citySlug;
-
     const hit =
-      airport.icao.toLowerCase().includes(needle) ||
+      airport.code.toLowerCase().includes(needle) ||
       (airport.iata?.toLowerCase().includes(needle) ?? false) ||
       (airport.faaLid?.toLowerCase().includes(needle) ?? false) ||
       airport.name.toLowerCase().includes(needle);
@@ -77,10 +83,10 @@ function search(q: string): Result[] {
       results.push({
         kind: "airport",
         id: airport.id,
-        code: airport.icao,
+        code: airport.code,
         name: airport.name,
-        location,
-        href: `/airports/${airport.icao.toLowerCase()}`,
+        location: airport.location,
+        href: airport.href,
       });
     }
   }
@@ -88,25 +94,27 @@ function search(q: string): Result[] {
   return results.slice(0, 8);
 }
 
-export function HeroSearch({ initialQuery = "" }: { initialQuery?: string }) {
+export function HeroSearch({
+  schools,
+  airports,
+  initialQuery = "",
+}: {
+  schools: SchoolSearchItem[];
+  airports: AirportSearchItem[];
+  initialQuery?: string;
+}) {
   const [query, setQuery] = useState(initialQuery);
-  const [results, setResults] = useState<Result[]>([]);
-  const [open, setOpen] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    if (query.length < 2) {
-      setResults([]);
-      setOpen(false);
-      return;
-    }
-    const hits = search(query);
-    setResults(hits);
-    setOpen(hits.length > 0);
-    setActiveIndex(-1);
-  }, [query]);
+  const results = useMemo(
+    () => (query.length < 2 ? [] : search(query, schools, airports)),
+    [query, schools, airports],
+  );
+  const open = !dismissed && results.length > 0;
+  const setOpen = (value: boolean) => setDismissed(!value);
 
   // Close on outside click
   useEffect(() => {
@@ -150,7 +158,11 @@ export function HeroSearch({ initialQuery = "" }: { initialQuery?: string }) {
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setDismissed(false);
+            setActiveIndex(-1);
+          }}
           onKeyDown={handleKeyDown}
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder="e.g. Mesa AZ, KFFZ, Arizona Pilot Academy..."
