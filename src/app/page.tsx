@@ -44,10 +44,11 @@ export default async function Home() {
 
   return (
     <div className="pb-20">
-      {/* Hero section */}
-      <section className="relative overflow-hidden bg-linear-to-br from-slate-950 via-blue-950 to-indigo-900 text-white py-28 px-4">
+      {/* Hero section — no overflow-hidden: the search dropdown must be able
+          to extend past the hero's bottom edge */}
+      <section className="relative bg-linear-to-br from-slate-950 via-blue-950 to-indigo-900 text-white py-28 px-4">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_60%_0%,rgba(59,130,246,0.15),transparent_70%)]" />
-        <div className="max-w-4xl mx-auto text-center relative">
+        <div className="max-w-4xl mx-auto text-center relative z-10">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
             Find Pilot Training Schools Across the USA
           </h1>
