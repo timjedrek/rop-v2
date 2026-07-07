@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { SchoolCard } from "@/components/SchoolCard";
-import { getFeaturedSchools, getCityBySlug, getStateBySlug } from "@/lib/mock-data";
+import { getFeaturedSchools, getLocationMaps } from "@/lib/data";
 import { schoolHref } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -22,13 +22,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function FeaturedSchoolsPage() {
-  const featuredSchools = getFeaturedSchools();
+export default async function FeaturedSchoolsPage() {
+  const [featuredSchools, { cityNameBySlug, stateBySlug }] = await Promise.all([
+    getFeaturedSchools(),
+    getLocationMaps(),
+  ]);
 
   return (
     <div className="pb-20">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-950 to-slate-700 text-white py-16 px-4">
+      <section className="bg-linear-to-br from-slate-950 via-blue-950 to-indigo-900 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
             Featured Flight Schools
@@ -46,10 +49,10 @@ export default function FeaturedSchoolsPage() {
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {featuredSchools.map((school) => {
-            const city = getCityBySlug(school.citySlug);
-            const state = getStateBySlug(school.stateSlug);
-            const location = city && state
-              ? `${city.name}, ${state.abbreviation}`
+            const cityName = cityNameBySlug[school.citySlug];
+            const state = stateBySlug[school.stateSlug];
+            const location = cityName && state
+              ? `${cityName}, ${state.abbreviation}`
               : school.citySlug;
             return (
               <SchoolCard

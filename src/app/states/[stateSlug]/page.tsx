@@ -3,20 +3,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Plane, MapPin, Building2, ChevronLeft } from "lucide-react";
 import {
-  states,
   getStateBySlug,
   getCitiesByState,
   getAirportsByState,
   getSchoolsByState,
-  getCityBySlug,
-} from "@/lib/mock-data";
+} from "@/lib/data";
 import { SchoolCard } from "@/components/SchoolCard";
+import { EmptyState } from "@/components/EmptyState";
 
 type Props = { params: Promise<{ stateSlug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { stateSlug } = await params;
-  const state = getStateBySlug(stateSlug);
+  const state = await getStateBySlug(stateSlug);
   if (!state) return { title: "State Not Found" };
   const title = `Flight Schools in ${state.name}`;
   const description = `Find flight schools in ${state.name}. Browse ${state.schoolCount} schools across ${state.airportCount} airports.`;
@@ -29,18 +28,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export function generateStaticParams() {
-  return states.map((s) => ({ stateSlug: s.slug }));
-}
-
 export default async function StateDetailPage({ params }: Props) {
   const { stateSlug } = await params;
-  const state = getStateBySlug(stateSlug);
+  const state = await getStateBySlug(stateSlug);
   if (!state) notFound();
 
-  const stateCities = getCitiesByState(stateSlug);
-  const stateAirports = getAirportsByState(stateSlug);
-  const stateSchools = getSchoolsByState(stateSlug);
+  const [stateCities, stateAirports, stateSchools] = await Promise.all([
+    getCitiesByState(stateSlug),
+    getAirportsByState(stateSlug),
+    getSchoolsByState(stateSlug),
+  ]);
+  const cityNameBySlug = Object.fromEntries(
+    stateCities.map((c) => [c.slug, c.name]),
+  );
 
   const itemListJsonLd = {
     "@context": "https://schema.org",
@@ -63,7 +63,7 @@ export default async function StateDetailPage({ params }: Props) {
       />
     <div className="pb-20">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-950 to-slate-700 text-white py-16 px-4">
+      <section className="bg-linear-to-br from-slate-950 via-blue-950 to-indigo-900 text-white py-16 px-4">
         <div className="max-w-5xl mx-auto">
           <Link
             href="/states"
@@ -170,8 +170,7 @@ export default async function StateDetailPage({ params }: Props) {
           {stateSchools.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {stateSchools.map((school) => {
-                const city = getCityBySlug(school.citySlug);
-                const cityName = city?.name ?? school.citySlug;
+                const cityName = cityNameBySlug[school.citySlug] ?? school.citySlug;
                 return (
                   <SchoolCard
                     key={school.id}
@@ -185,17 +184,10 @@ export default async function StateDetailPage({ params }: Props) {
               })}
             </div>
           ) : (
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-10 text-center text-slate-500 dark:text-slate-400">
-              <p className="text-lg font-medium mb-1">
-                No listings yet for {state.name}
-              </p>
-              <p className="text-sm">
-                Know a flight school here?{" "}
-                <Link href="#" className="text-blue-600 hover:underline">
-                  Submit a listing
-                </Link>
-              </p>
-            </div>
+            <EmptyState
+              title={`No listings yet for ${state.name}`}
+              hint="Know a flight school here?"
+            />
           )}
         </section>
       </div>

@@ -1,5 +1,10 @@
 import type { MetadataRoute } from "next";
-import { states, cities, airports, flightSchools } from "@/lib/mock-data";
+import {
+  getStates,
+  getCities,
+  getAirports,
+  getFlightSchools,
+} from "@/lib/data";
 import { schoolHref } from "@/lib/utils";
 
 const BASE_URL =
@@ -8,7 +13,17 @@ const BASE_URL =
     ? `https://${process.env.VERCEL_URL}`
     : "http://localhost:3000");
 
-export default function sitemap(): MetadataRoute.Sitemap {
+// Rendered per request — the sitemap reads live rows from Supabase
+export const dynamic = "force-dynamic";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [states, cities, airports, flightSchools] = await Promise.all([
+    getStates(),
+    getCities(),
+    getAirports(),
+    getFlightSchools(),
+  ]);
+
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: BASE_URL, changeFrequency: "weekly", priority: 1 },
     { url: `${BASE_URL}/states`, changeFrequency: "monthly", priority: 0.8 },

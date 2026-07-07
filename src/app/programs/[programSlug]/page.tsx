@@ -3,14 +3,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft, Clock, CheckCircle, BookOpen } from "lucide-react";
 import {
-  programs,
   getProgramBySlug,
-  getProgramBySlug as getPrereqBySlug,
+  getProgramsBySlugs,
   getSchoolsByProgram,
-  getCityBySlug,
-  getStateBySlug,
-  getAirportByCode,
-} from "@/lib/mock-data";
+  getLocationMaps,
+  getAirports,
+} from "@/lib/data";
 import { SchoolsExplorer } from "@/components/SchoolsExplorer";
 import { schoolHref } from "@/lib/utils";
 
@@ -18,7 +16,7 @@ type Props = { params: Promise<{ programSlug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { programSlug } = await params;
-  const program = getProgramBySlug(programSlug);
+  const program = await getProgramBySlug(programSlug);
   if (!program) return { title: "Program Not Found" };
 
   const title = `${program.name} – Flight Training Requirements & Schools`;
@@ -32,38 +30,40 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export function generateStaticParams() {
-  return programs.map((p) => ({ programSlug: p.slug }));
-}
-
 export default async function ProgramDetailPage({ params }: Props) {
   const { programSlug } = await params;
-  const program = getProgramBySlug(programSlug);
+  const program = await getProgramBySlug(programSlug);
   if (!program) notFound();
 
-  const rawSchools = getSchoolsByProgram(program.slug);
+  const [rawSchools, { cityNameBySlug, stateBySlug }, airports, prereqs] =
+    await Promise.all([
+      getSchoolsByProgram(program.slug),
+      getLocationMaps(),
+      getAirports(),
+      getProgramsBySlugs(program.prerequisites ?? []),
+    ]);
+  const airportNameByIcao = Object.fromEntries(
+    airports.map((a) => [a.icao, a.name]),
+  );
+
   const schools = rawSchools.map((school) => {
-    const city = getCityBySlug(school.citySlug);
-    const state = getStateBySlug(school.stateSlug);
-    const airport = getAirportByCode(school.primaryAirportCode);
+    const cityName = cityNameBySlug[school.citySlug];
+    const state = stateBySlug[school.stateSlug];
     return {
       id: school.id,
       name: school.name,
       href: schoolHref(school),
       airportCode: school.primaryAirportCode,
-      airportName: airport?.name,
-      location: city && state ? `${city.name}, ${state.abbreviation}` : undefined,
+      airportName: airportNameByIcao[school.primaryAirportCode],
+      location: cityName && state ? `${cityName}, ${state.abbreviation}` : undefined,
       rating: school.rating,
     };
   });
-  const prereqs = (program.prerequisites ?? [])
-    .map((slug) => getPrereqBySlug(slug))
-    .filter(Boolean);
 
   return (
     <div className="pb-20">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-950 to-slate-700 text-white py-16 px-4">
+      <section className="bg-linear-to-br from-slate-950 via-blue-950 to-indigo-900 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <Link
             href="/programs"

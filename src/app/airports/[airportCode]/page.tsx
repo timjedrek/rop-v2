@@ -3,23 +3,26 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Plane, ChevronLeft } from "lucide-react";
 import {
-  airports,
   getAirportByCode,
   getCityBySlug,
   getStateBySlug,
   getSchoolsByAirport,
-} from "@/lib/mock-data";
+  getLocationMaps,
+} from "@/lib/data";
 import { SchoolCard } from "@/components/SchoolCard";
+import { EmptyState } from "@/components/EmptyState";
 
 type Props = { params: Promise<{ airportCode: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { airportCode } = await params;
-  const airport = getAirportByCode(airportCode);
+  const airport = await getAirportByCode(airportCode);
   if (!airport) return { title: "Airport Not Found" };
-  const city = getCityBySlug(airport.citySlug);
-  const state = getStateBySlug(airport.stateSlug);
-  const schools = getSchoolsByAirport(airport.icao);
+  const [city, state, schools] = await Promise.all([
+    getCityBySlug(airport.citySlug),
+    getStateBySlug(airport.stateSlug),
+    getSchoolsByAirport(airport.icao),
+  ]);
   const fallbackDesc = `Find ${schools.length} flight school${schools.length !== 1 ? "s" : ""} at ${airport.name} (${airport.icao}) in ${city?.name ?? ""}, ${state?.name ?? ""}.`;
   const description = airport.description
     ? airport.description.slice(0, 160)
@@ -34,18 +37,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export function generateStaticParams() {
-  return airports.map((a) => ({ airportCode: a.icao.toLowerCase() }));
-}
-
 export default async function AirportDetailPage({ params }: Props) {
   const { airportCode } = await params;
-  const airport = getAirportByCode(airportCode);
+  const airport = await getAirportByCode(airportCode);
   if (!airport) notFound();
 
-  const city = getCityBySlug(airport.citySlug);
-  const state = getStateBySlug(airport.stateSlug);
-  const schools = getSchoolsByAirport(airport.icao);
+  const [city, state, schools, { cityNameBySlug, stateBySlug }] =
+    await Promise.all([
+      getCityBySlug(airport.citySlug),
+      getStateBySlug(airport.stateSlug),
+      getSchoolsByAirport(airport.icao),
+      getLocationMaps(),
+    ]);
 
   const itemListJsonLd = {
     "@context": "https://schema.org",
@@ -68,7 +71,7 @@ export default async function AirportDetailPage({ params }: Props) {
       />
     <div className="pb-20">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-950 to-slate-700 text-white py-16 px-4">
+      <section className="bg-linear-to-br from-slate-950 via-blue-950 to-indigo-900 text-white py-16 px-4">
         <div className="max-w-5xl mx-auto">
           <Link
             href={city ? `/cities/${city.slug}` : "/states"}
@@ -141,15 +144,15 @@ export default async function AirportDetailPage({ params }: Props) {
           {schools.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {schools.map((school) => {
-                const schoolCity = getCityBySlug(school.citySlug);
-                const schoolState = getStateBySlug(school.stateSlug);
+                const cityName = cityNameBySlug[school.citySlug];
+                const schoolState = stateBySlug[school.stateSlug];
                 return (
                   <SchoolCard
                     key={school.id}
                     name={school.name}
                     location={
-                      schoolCity && schoolState
-                        ? `${schoolCity.name}, ${schoolState.abbreviation}`
+                      cityName && schoolState
+                        ? `${cityName}, ${schoolState.abbreviation}`
                         : school.citySlug
                     }
                     rating={school.rating}
@@ -160,17 +163,10 @@ export default async function AirportDetailPage({ params }: Props) {
               })}
             </div>
           ) : (
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-10 text-center text-slate-500 dark:text-slate-400">
-              <p className="text-lg font-medium mb-1">
-                No listings yet for {airport.icao}
-              </p>
-              <p className="text-sm">
-                Know a flight school at this airport?{" "}
-                <Link href="#" className="text-blue-600 hover:underline">
-                  Submit a listing
-                </Link>
-              </p>
-            </div>
+            <EmptyState
+              title={`No listings yet for ${airport.icao}`}
+              hint="Know a flight school at this airport?"
+            />
           )}
         </section>
 

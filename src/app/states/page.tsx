@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { states } from "@/lib/mock-data";
+import { getStates } from "@/lib/data";
 import { StatesExplorer } from "@/components/StatesExplorer";
 
 export const metadata: Metadata = {
@@ -21,6 +21,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function StatesPage() {
+export default async function StatesPage() {
+  const states = await getStates();
   return <StatesExplorer states={states} />;
 }

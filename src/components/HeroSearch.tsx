@@ -1,53 +1,80 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Search, MapPin, Plane } from "lucide-react";
-import { flightSchools, airports, getCityBySlug, getStateBySlug } from "@/lib/mock-data";
-import { schoolHref } from "@/lib/utils";
+
+export type SchoolSearchItem = {
+  id: string;
+  name: string;
+  location: string;
+  href: string;
+  airport: string;
+  stateName: string;
+  stateAbbreviation: string;
+};
+
+export type AirportSearchItem = {
+  id: string;
+  code: string;
+  iata: string | null;
+  faaLid: string | null;
+  name: string;
+  location: string;
+  href: string;
+};
 
 type Result =
-  | { kind: "school"; id: string; name: string; location: string; href: string; airport: string }
-  | { kind: "airport"; id: string; code: string; name: string; location: string; href: string };
+  | {
+      kind: "school";
+      id: string;
+      name: string;
+      location: string;
+      href: string;
+      airport: string;
+    }
+  | {
+      kind: "airport";
+      id: string;
+      code: string;
+      name: string;
+      location: string;
+      href: string;
+    };
 
-function search(q: string): Result[] {
+function search(
+  q: string,
+  schools: SchoolSearchItem[],
+  airports: AirportSearchItem[],
+): Result[] {
   const needle = q.toLowerCase().trim();
   if (!needle) return [];
 
   const results: Result[] = [];
 
-  for (const school of flightSchools) {
-    const city = getCityBySlug(school.citySlug);
-    const state = getStateBySlug(school.stateSlug);
-    const location = city && state ? `${city.name}, ${state.abbreviation}` : school.citySlug;
-
+  for (const school of schools) {
     const hit =
       school.name.toLowerCase().includes(needle) ||
-      school.primaryAirportCode.toLowerCase().includes(needle) ||
-      location.toLowerCase().includes(needle) ||
-      (city?.name.toLowerCase().includes(needle) ?? false) ||
-      (state?.name.toLowerCase().includes(needle) ?? false) ||
-      (state?.abbreviation.toLowerCase() === needle);
+      school.airport.toLowerCase().includes(needle) ||
+      school.location.toLowerCase().includes(needle) ||
+      school.stateName.toLowerCase().includes(needle) ||
+      school.stateAbbreviation.toLowerCase() === needle;
 
     if (hit) {
       results.push({
         kind: "school",
         id: school.id,
         name: school.name,
-        location,
-        href: schoolHref(school),
-        airport: school.primaryAirportCode,
+        location: school.location,
+        href: school.href,
+        airport: school.airport,
       });
     }
   }
 
   for (const airport of airports) {
-    const city = getCityBySlug(airport.citySlug);
-    const state = getStateBySlug(airport.stateSlug);
-    const location = city && state ? `${city.name}, ${state.abbreviation}` : airport.citySlug;
-
     const hit =
-      airport.icao.toLowerCase().includes(needle) ||
+      airport.code.toLowerCase().includes(needle) ||
       (airport.iata?.toLowerCase().includes(needle) ?? false) ||
       (airport.faaLid?.toLowerCase().includes(needle) ?? false) ||
       airport.name.toLowerCase().includes(needle);
@@ -56,10 +83,10 @@ function search(q: string): Result[] {
       results.push({
         kind: "airport",
         id: airport.id,
-        code: airport.icao,
+        code: airport.code,
         name: airport.name,
-        location,
-        href: `/airports/${airport.icao.toLowerCase()}`,
+        location: airport.location,
+        href: airport.href,
       });
     }
   }
@@ -67,30 +94,35 @@ function search(q: string): Result[] {
   return results.slice(0, 8);
 }
 
-export function HeroSearch({ initialQuery = "" }: { initialQuery?: string }) {
+export function HeroSearch({
+  schools,
+  airports,
+  initialQuery = "",
+}: {
+  schools: SchoolSearchItem[];
+  airports: AirportSearchItem[];
+  initialQuery?: string;
+}) {
   const [query, setQuery] = useState(initialQuery);
-  const [results, setResults] = useState<Result[]>([]);
-  const [open, setOpen] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    if (query.length < 2) {
-      setResults([]);
-      setOpen(false);
-      return;
-    }
-    const hits = search(query);
-    setResults(hits);
-    setOpen(hits.length > 0);
-    setActiveIndex(-1);
-  }, [query]);
+  const results = useMemo(
+    () => (query.length < 2 ? [] : search(query, schools, airports)),
+    [query, schools, airports],
+  );
+  const open = !dismissed && results.length > 0;
+  const setOpen = (value: boolean) => setDismissed(!value);
 
   // Close on outside click
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -122,21 +154,26 @@ export function HeroSearch({ initialQuery = "" }: { initialQuery?: string }) {
 
   return (
     <div ref={containerRef} className="max-w-2xl mx-auto relative">
-      <div className="flex rounded-lg overflow-hidden shadow-xl bg-slate-500">
+      <div className="flex items-center rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/20 bg-white/10 backdrop-blur-md transition focus-within:ring-2 focus-within:ring-rose-300/70 focus-within:bg-white/15">
+        <Search className="w-5 h-5 text-slate-300 shrink-0 ml-5" aria-hidden />
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setDismissed(false);
+            setActiveIndex(-1);
+          }}
           onKeyDown={handleKeyDown}
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder="e.g. Mesa AZ, KFFZ, Arizona Pilot Academy..."
           autoComplete="off"
-          className="flex-1 px-6 py-5 text-lg text-slate-100 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-rose-300 bg-transparent"
+          className="flex-1 px-4 py-5 text-lg text-slate-100 placeholder:text-slate-400 focus:outline-none bg-transparent"
         />
       </div>
 
       {open && (
-        <ul className="absolute z-50 top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-2xl overflow-hidden">
+        <ul className="absolute z-50 top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-xl shadow-2xl ring-1 ring-black/5 overflow-hidden text-left">
           {results.map((result, i) => (
             <li key={result.id}>
               <button
@@ -151,7 +188,7 @@ export function HeroSearch({ initialQuery = "" }: { initialQuery?: string }) {
               >
                 {result.kind === "school" ? (
                   <>
-                    <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                    <Search className="w-4 h-4 text-slate-400 shrink-0" />
                     <div className="min-w-0">
                       <p className="font-semibold text-slate-800 dark:text-slate-100 truncate">
                         {result.name}
@@ -159,16 +196,20 @@ export function HeroSearch({ initialQuery = "" }: { initialQuery?: string }) {
                       <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
                         <MapPin className="w-3 h-3" />
                         {result.location}
-                        <span className="ml-1 text-xs text-slate-400">· {result.airport}</span>
+                        <span className="ml-1 text-xs text-slate-400">
+                          · {result.airport}
+                        </span>
                       </p>
                     </div>
                   </>
                 ) : (
                   <>
-                    <Plane className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <Plane className="w-4 h-4 text-blue-500 shrink-0" />
                     <div className="min-w-0">
                       <p className="font-semibold text-slate-800 dark:text-slate-100 truncate">
-                        <span className="text-blue-700 dark:text-blue-400">{result.code}</span>
+                        <span className="text-blue-700 dark:text-blue-400">
+                          {result.code}
+                        </span>
                         <span className="text-slate-400 mx-1">&nbsp;</span>
                         {result.name}
                       </p>

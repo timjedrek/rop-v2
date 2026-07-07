@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BookOpen, Clock, ChevronRight } from "lucide-react";
-import { programs } from "@/lib/mock-data";
+import { getPrograms } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Flight Training Programs – Certificates, Ratings & Endorsements",
@@ -17,13 +17,13 @@ export const metadata: Metadata = {
   },
 };
 
-const sorted = [...programs].sort((a, b) => a.sortOrder - b.sortOrder);
+export default async function ProgramsPage() {
+  const sorted = await getPrograms();
 
-export default function ProgramsPage() {
   return (
     <div className="pb-20">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-950 to-slate-700 text-white py-16 px-4">
+      <section className="bg-linear-to-br from-slate-950 via-blue-950 to-indigo-900 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm mb-6">
             <BookOpen size={15} />

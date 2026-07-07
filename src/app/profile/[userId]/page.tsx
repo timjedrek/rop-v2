@@ -7,20 +7,18 @@ import {
   getReviewsByUser,
   getCommentsByUser,
   getSchoolsManagedByUser,
-  getSchoolBySlug,
-  getCityBySlug,
-  getStateBySlug,
-  getProgramBySlug,
-  reviews as allReviews,
-  users,
-} from "@/lib/mock-data";
+  getSchoolsByIds,
+  getReviewsByIds,
+  getPrograms,
+  getLocationMaps,
+} from "@/lib/data";
 import { schoolHref } from "@/lib/utils";
 
 type Props = { params: Promise<{ userId: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { userId } = await params;
-  const user = getUserById(userId);
+  const user = await getUserById(userId);
   if (!user) return { title: "User Not Found" };
   return {
     title: `${user.firstName} ${user.lastName} – Flight School Finder`,
@@ -29,28 +27,43 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export function generateStaticParams() {
-  return users.map((u) => ({ userId: u.id }));
-}
-
 export default async function ProfilePage({ params }: Props) {
   const { userId } = await params;
-  const user = getUserById(userId);
+  const user = await getUserById(userId);
   if (!user) notFound();
 
-  const reviews = getReviewsByUser(userId);
-  const userComments = getCommentsByUser(userId);
-  const managedSchools = getSchoolsManagedByUser(userId);
-  const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+  const [reviews, userComments, managedSchools, allPrograms, locationMaps] =
+    await Promise.all([
+      getReviewsByUser(userId),
+      getCommentsByUser(userId),
+      getSchoolsManagedByUser(userId),
+      getPrograms(),
+      getLocationMaps(),
+    ]);
+  const { cityNameBySlug, stateBySlug } = locationMaps;
+  const programShortNames = Object.fromEntries(
+    allPrograms.map((p) => [p.slug, p.shortName]),
+  );
+
+  // Resolve the schools behind this user's reviews and comments
+  const commentedReviews = await getReviewsByIds(
+    userComments.map((c) => c.reviewId),
+  );
+  const schoolsById = await getSchoolsByIds([
+    ...reviews.map((r) => r.schoolId),
+    ...Object.values(commentedReviews).map((r) => r.schoolId),
+  ]);
+
+  const initials = `${(user.firstName[0] ?? "?")}${user.lastName[0] ?? ""}`.toUpperCase();
   const joinedYear = new Date(user.joinedAt).getFullYear();
 
   return (
     <div className="pb-20">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-950 to-slate-700 text-white py-16 px-4">
+      <section className="bg-linear-to-br from-slate-950 via-blue-950 to-indigo-900 text-white py-16 px-4">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center sm:items-start gap-6">
           {/* Avatar */}
-          <div className="w-20 h-20 rounded-full bg-blue-700 flex items-center justify-center text-2xl font-extrabold flex-shrink-0">
+          <div className="w-20 h-20 rounded-full bg-blue-700 flex items-center justify-center text-2xl font-extrabold shrink-0">
             {initials}
           </div>
 
@@ -71,17 +84,14 @@ export default async function ProfilePage({ params }: Props) {
             {/* Pilot certificates — labels come from the programs catalog */}
             {user.pilotCertificates && user.pilotCertificates.length > 0 && (
               <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                {user.pilotCertificates.map((slug) => {
-                  const program = getProgramBySlug(slug);
-                  return (
-                    <span
-                      key={slug}
-                      className="text-xs font-semibold bg-blue-800 border border-blue-600 px-2 py-1 rounded-full"
-                    >
-                      {program?.shortName ?? slug}
-                    </span>
-                  );
-                })}
+                {user.pilotCertificates.map((slug) => (
+                  <span
+                    key={slug}
+                    className="text-xs font-semibold bg-blue-800 border border-blue-600 px-2 py-1 rounded-full"
+                  >
+                    {programShortNames[slug] ?? slug}
+                  </span>
+                ))}
               </div>
             )}
           </div>
@@ -115,9 +125,11 @@ export default async function ProfilePage({ params }: Props) {
           ) : (
             <div className="space-y-4">
               {reviews.map((review) => {
-                const school = getSchoolBySlug(review.schoolId);
-                const city = school ? getCityBySlug(school.citySlug) : null;
-                const state = school ? getStateBySlug(school.stateSlug) : null;
+                const school = schoolsById[review.schoolId];
+                const city = school
+                  ? { name: cityNameBySlug[school.citySlug] ?? school.citySlug }
+                  : null;
+                const state = school ? stateBySlug[school.stateSlug] : null;
                 const href = school ? schoolHref(school) : null;
 
                 return (
@@ -145,7 +157,7 @@ export default async function ProfilePage({ params }: Props) {
                           </p>
                         )}
                       </div>
-                      <div className="flex items-center gap-0.5 flex-shrink-0">
+                      <div className="flex items-center gap-0.5 shrink-0">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Star
                             key={i}
@@ -214,8 +226,8 @@ export default async function ProfilePage({ params }: Props) {
           ) : (
             <div className="space-y-3">
               {userComments.map((comment) => {
-                const review = allReviews.find((r) => r.id === comment.reviewId);
-                const school = review ? getSchoolBySlug(review.schoolId) : null;
+                const review = commentedReviews[comment.reviewId];
+                const school = review ? schoolsById[review.schoolId] : null;
                 const href = school ? schoolHref(school) : null;
                 return (
                   <div
@@ -271,8 +283,10 @@ export default async function ProfilePage({ params }: Props) {
           ) : (
             <div className="space-y-3">
               {managedSchools.map((school) => {
-                const city = getCityBySlug(school.citySlug);
-                const state = getStateBySlug(school.stateSlug);
+                const city = cityNameBySlug[school.citySlug]
+                  ? { name: cityNameBySlug[school.citySlug] }
+                  : null;
+                const state = stateBySlug[school.stateSlug];
                 return (
                   <div
                     key={school.id}
@@ -293,7 +307,7 @@ export default async function ProfilePage({ params }: Props) {
                     </div>
                     <Link
                       href={`/schools/${school.slug}/edit`}
-                      className="text-sm font-semibold text-blue-700 dark:text-blue-400 hover:underline flex-shrink-0"
+                      className="text-sm font-semibold text-blue-700 dark:text-blue-400 hover:underline shrink-0"
                     >
                       Edit
                     </Link>

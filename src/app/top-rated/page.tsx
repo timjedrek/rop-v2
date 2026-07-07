@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Star } from "lucide-react";
-import { getTopRatedSchools, getCityBySlug, getStateBySlug } from "@/lib/mock-data";
+import { getTopRatedSchools, getLocationMaps } from "@/lib/data";
 import { schoolHref } from "@/lib/utils";
 import { TopRatedExplorer } from "@/components/TopRatedExplorer";
 
@@ -23,13 +23,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function TopRatedPage() {
-  const schools = getTopRatedSchools().map((school) => {
-    const city = getCityBySlug(school.citySlug);
-    const state = getStateBySlug(school.stateSlug);
+export default async function TopRatedPage() {
+  const [topRated, { cityNameBySlug, stateBySlug }] = await Promise.all([
+    getTopRatedSchools(),
+    getLocationMaps(),
+  ]);
+  const schools = topRated.map((school) => {
+    const cityName = cityNameBySlug[school.citySlug];
+    const state = stateBySlug[school.stateSlug];
     return {
       ...school,
-      location: city && state ? `${city.name}, ${state.abbreviation}` : school.citySlug,
+      location: cityName && state ? `${cityName}, ${state.abbreviation}` : school.citySlug,
       href: schoolHref(school),
     };
   });
@@ -37,7 +41,7 @@ export default function TopRatedPage() {
   return (
     <div className="pb-20">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-950 to-slate-700 text-white py-16 px-4">
+      <section className="bg-linear-to-br from-slate-950 via-blue-950 to-indigo-900 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex justify-center mb-4">
             <Star className="w-10 h-10 fill-yellow-500 text-yellow-500 opacity-90" />

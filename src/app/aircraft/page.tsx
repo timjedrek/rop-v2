@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Plane, ChevronRight } from "lucide-react";
-import { trainerAircraft } from "@/lib/mock-data";
+import { getTrainerAircraft } from "@/lib/data";
 import type { AircraftCategory } from "@/lib/types";
 import { Suspense } from "react";
 import AircraftFilterBar from "@/components/AircraftFilterBar";
@@ -36,16 +36,6 @@ const categoryOrder: AircraftCategory[] = [
   "glider",
 ];
 
-const sorted = [...trainerAircraft].sort((a, b) => a.sortOrder - b.sortOrder);
-
-const grouped = categoryOrder
-  .map((cat) => ({
-    category: cat,
-    label: categoryLabels[cat],
-    aircraft: sorted.filter((a) => a.category === cat),
-  }))
-  .filter((g) => g.aircraft.length > 0);
-
 export default async function AircraftPage({
   searchParams,
 }: {
@@ -54,6 +44,15 @@ export default async function AircraftPage({
   const { category } = await searchParams;
   const activeCategory = category as AircraftCategory | undefined;
 
+  const sorted = await getTrainerAircraft();
+  const grouped = categoryOrder
+    .map((cat) => ({
+      category: cat,
+      label: categoryLabels[cat],
+      aircraft: sorted.filter((a) => a.category === cat),
+    }))
+    .filter((g) => g.aircraft.length > 0);
+
   const visibleGroups = activeCategory
     ? grouped.filter((g) => g.category === activeCategory)
     : grouped;
@@ -61,7 +60,7 @@ export default async function AircraftPage({
   return (
     <div className="pb-20">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-950 to-slate-700 text-white py-16 px-4">
+      <section className="bg-linear-to-br from-slate-950 via-blue-950 to-indigo-900 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm mb-6">
             <Plane size={15} />
