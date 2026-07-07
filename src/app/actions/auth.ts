@@ -61,10 +61,35 @@ export async function resetPassword(
   const { error } = await supabase.auth.resetPasswordForEmail(
     formData.get("email") as string,
     {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/update-password`,
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/confirm?next=/update-password`,
     },
   );
 
   if (error) return { error: error.message };
   return { message: "Check your email for a password reset link." };
+}
+
+export async function updatePassword(
+  _prevState: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const supabase = await createClient();
+
+  const password = formData.get("password") as string;
+  const confirmPassword = formData.get("confirmPassword") as string;
+
+  if (password !== confirmPassword) {
+    return { error: "Passwords do not match." };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) return { error: error.message };
+  redirect("/login?message=password-updated");
+}
+
+export async function logout() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/");
 }
