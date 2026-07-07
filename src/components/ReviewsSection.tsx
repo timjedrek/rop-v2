@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useActionState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Star, MessageSquare, CheckCircle } from "lucide-react";
-import type { Review, Comment } from "@/lib/types";
-import { getUserById, getProgramBySlug } from "@/lib/mock-data";
+import type { Review, Comment, User } from "@/lib/types";
+import { submitComment } from "@/app/actions/reviews";
 
 const SUBCATEGORIES: { key: keyof Review; label: string }[] = [
   { key: "customerService", label: "Customer Service" },
@@ -31,61 +33,69 @@ function StarRow({ filled, size = 14 }: { filled: number; size?: number }) {
 }
 
 function CommentForm({ reviewId }: { reviewId: string }) {
-  const [name, setName] = useState("");
-  const [body, setBody] = useState("");
-  const [error, setError] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const pathname = usePathname();
+  const [state, action, pending] = useActionState(submitComment, {});
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!name.trim()) { setError("Please enter your name."); return; }
-    if (!body.trim()) { setError("Please write your comment."); return; }
-    void reviewId;
-    setSubmitted(true);
-  }
-
-  if (submitted) {
+  if (state.success) {
     return (
       <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg px-4 py-3">
         <CheckCircle size={16} />
-        <span>Comment submitted — it will appear after approval.</span>
+        <span>Comment posted.</span>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 mt-3">
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Your name"
-        className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+    <form action={action} className="space-y-3 mt-3">
+      <input type="hidden" name="reviewId" value={reviewId} />
+      <input type="hidden" name="path" value={pathname} />
       <textarea
         rows={3}
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
+        name="body"
+        required
         placeholder="Add a comment…"
         className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
       />
-      {error && <p className="text-xs text-rose-600 dark:text-rose-400">{error}</p>}
+      {state.error && (
+        <p className="text-xs text-rose-600 dark:text-rose-400">
+          {state.error}
+          {state.error.includes("logged in") && (
+            <>
+              {" "}
+              <Link href="/login" className="font-semibold underline">
+                Log in
+              </Link>
+            </>
+          )}
+        </p>
+      )}
       <div className="flex items-center gap-3">
         <button
           type="submit"
-          className="px-4 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-lg text-sm transition"
+          disabled={pending}
+          className="px-4 py-1.5 bg-blue-700 hover:bg-blue-800 disabled:opacity-60 text-white font-semibold rounded-lg text-sm transition"
         >
-          Post Comment
+          {pending ? "Posting…" : "Post Comment"}
         </button>
       </div>
     </form>
   );
 }
 
-function ReviewCard({ review, comments }: { review: Review; comments: Comment[] }) {
+function ReviewCard({
+  review,
+  comments,
+  usersById,
+  programShortNames,
+}: {
+  review: Review;
+  comments: Comment[];
+  usersById: Record<string, User>;
+  programShortNames: Record<string, string>;
+}) {
   const [showForm, setShowForm] = useState(false);
 
-  const user = getUserById(review.userId);
+  const user = usersById[review.userId];
   const fullName = user ? `${user.firstName} ${user.lastName}` : "Anonymous";
   const date = new Date(review.createdAt).toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric",
@@ -104,17 +114,14 @@ function ReviewCard({ review, comments }: { review: Review; comments: Comment[] 
           </Link>
           {user?.pilotCertificates && user.pilotCertificates.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-1">
-              {user.pilotCertificates.map((slug) => {
-                const program = getProgramBySlug(slug);
-                return (
-                  <span
-                    key={slug}
-                    className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded"
-                  >
-                    {program?.shortName ?? slug}
-                  </span>
-                );
-              })}
+              {user.pilotCertificates.map((slug) => (
+                <span
+                  key={slug}
+                  className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded"
+                >
+                  {programShortNames[slug] ?? slug}
+                </span>
+              ))}
             </div>
           )}
           <div className="mt-1.5">
@@ -143,7 +150,7 @@ function ReviewCard({ review, comments }: { review: Review; comments: Comment[] 
       {comments.length > 0 && (
         <div className="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-3 mb-3">
           {comments.map((comment) => {
-            const commenter = getUserById(comment.userId);
+            const commenter = usersById[comment.userId];
             const commenterName = commenter
               ? `${commenter.firstName} ${commenter.lastName}`
               : "Anonymous";
@@ -192,9 +199,13 @@ function ReviewCard({ review, comments }: { review: Review; comments: Comment[] 
 export default function ReviewsSection({
   reviews,
   commentsByReview,
+  usersById,
+  programShortNames,
 }: {
   reviews: Review[];
   commentsByReview: Record<string, Comment[]>;
+  usersById: Record<string, User>;
+  programShortNames: Record<string, string>;
 }) {
   if (reviews.length === 0) {
     return (
@@ -277,6 +288,8 @@ export default function ReviewsSection({
             key={review.id}
             review={review}
             comments={commentsByReview[review.id] ?? []}
+            usersById={usersById}
+            programShortNames={programShortNames}
           />
         ))}
       </div>
