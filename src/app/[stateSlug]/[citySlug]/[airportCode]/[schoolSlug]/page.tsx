@@ -3,17 +3,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft, MapPin, Phone, Globe, Star, Plane, Users, Mail } from "lucide-react";
 import {
-  flightSchools,
   getSchoolBySlug,
   getCityBySlug,
   getStateBySlug,
   getAirportByCode,
   getRelatedSchools,
   getReviewsBySchool,
-  getCommentsByReview,
-  getProgramsBySchool,
-  getAircraftBySchool,
-} from "@/lib/mock-data";
+  getCommentsForReviews,
+  getProgramsBySlugs,
+  getAircraftBySlugs,
+  getPrograms,
+  getUsersByIds,
+  getLocationMaps,
+  getAirports,
+} from "@/lib/data";
 import ReviewsSection from "@/components/ReviewsSection";
 import ReviewForm from "@/components/ReviewForm";
 
@@ -28,10 +31,12 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { schoolSlug, stateSlug, citySlug, airportCode } = await params;
-  const school = getSchoolBySlug(schoolSlug);
+  const school = await getSchoolBySlug(schoolSlug);
   if (!school) return { title: "School Not Found" };
-  const city = getCityBySlug(school.citySlug);
-  const state = getStateBySlug(school.stateSlug);
+  const [city, state] = await Promise.all([
+    getCityBySlug(school.citySlug),
+    getStateBySlug(school.stateSlug),
+  ]);
   const title = `${school.name} – Flight School in ${city?.name ?? ""}, ${state?.abbreviation ?? ""}`;
   const description = school.description.slice(0, 160);
   const canonical = `/${stateSlug}/${citySlug}/${airportCode}/${schoolSlug}`;
@@ -44,38 +49,66 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export function generateStaticParams() {
-  return flightSchools.map((s) => ({
-    stateSlug: s.stateSlug,
-    citySlug: s.citySlug,
-    airportCode: s.primaryAirportCode.toLowerCase(),
-    schoolSlug: s.slug,
-  }));
-}
-
 export default async function SchoolDetailPage({ params }: Props) {
   const { schoolSlug } = await params;
-  const school = getSchoolBySlug(schoolSlug);
+  const school = await getSchoolBySlug(schoolSlug);
   if (!school) notFound();
 
-  const city = getCityBySlug(school.citySlug);
-  const state = getStateBySlug(school.stateSlug);
-  const primaryAirport = getAirportByCode(school.primaryAirportCode);
+  const [
+    city,
+    state,
+    primaryAirport,
+    schoolReviews,
+    schoolPrograms,
+    schoolAircraft,
+    rawRelated,
+    allPrograms,
+  ] = await Promise.all([
+    getCityBySlug(school.citySlug),
+    getStateBySlug(school.stateSlug),
+    getAirportByCode(school.primaryAirportCode),
+    getReviewsBySchool(school.id),
+    getProgramsBySlugs(school.programSlugs),
+    getAircraftBySlugs(school.aircraftSlugs ?? []),
+    getRelatedSchools(school),
+    getPrograms(),
+  ]);
 
-  const schoolReviews = getReviewsBySchool(school.id);
-  const commentsByReview = Object.fromEntries(
-    schoolReviews.map((r) => [r.id, getCommentsByReview(r.id)])
+  const commentsByReview = await getCommentsForReviews(
+    schoolReviews.map((r) => r.id),
   );
-  const schoolPrograms = getProgramsBySchool(school);
-  const schoolAircraft = getAircraftBySchool(school);
+
+  // Profiles for review + comment authors, and program labels for their certificates
+  const authorIds = [
+    ...schoolReviews.map((r) => r.userId),
+    ...Object.values(commentsByReview).flatMap((cs) => cs.map((c) => c.userId)),
+  ];
+  const usersById = await getUsersByIds(authorIds);
+  const programShortNames = Object.fromEntries(
+    allPrograms.map((p) => [p.slug, p.shortName]),
+  );
 
   // Resolve sibling listings for the same brand
-  const relatedSchools = getRelatedSchools(school).map((s) => ({
-    ...s,
-    airport: getAirportByCode(s.primaryAirportCode),
-    city: getCityBySlug(s.citySlug),
-    state: getStateBySlug(s.stateSlug),
-  }));
+  let relatedSchools: ((typeof rawRelated)[number] & {
+    airport?: { name: string };
+    city?: { name: string };
+    state?: { abbreviation: string };
+  })[] = [];
+  if (rawRelated.length > 0) {
+    const [{ cityNameBySlug, stateBySlug }, airports] = await Promise.all([
+      getLocationMaps(),
+      getAirports(),
+    ]);
+    const airportByIcao = Object.fromEntries(airports.map((a) => [a.icao, a]));
+    relatedSchools = rawRelated.map((s) => ({
+      ...s,
+      airport: airportByIcao[s.primaryAirportCode],
+      city: cityNameBySlug[s.citySlug]
+        ? { name: cityNameBySlug[s.citySlug] }
+        : undefined,
+      state: stateBySlug[s.stateSlug],
+    }));
+  }
 
   // JSON-LD BreadcrumbList structured data
   const breadcrumbJsonLd = {
@@ -399,7 +432,12 @@ export default async function SchoolDetailPage({ params }: Props) {
             <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">
               Student Reviews
             </h2>
-            <ReviewsSection reviews={schoolReviews} commentsByReview={commentsByReview} />
+            <ReviewsSection
+              reviews={schoolReviews}
+              commentsByReview={commentsByReview}
+              usersById={usersById}
+              programShortNames={programShortNames}
+            />
           </section>
 
           {/* Write a Review */}

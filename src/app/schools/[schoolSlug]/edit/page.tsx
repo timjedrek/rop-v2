@@ -5,15 +5,15 @@ import {
   getSchoolBySlug,
   getCityBySlug,
   getStateBySlug,
-  programs,
-} from "@/lib/mock-data";
+  getPrograms,
+} from "@/lib/data";
 import { SchoolContactsField } from "@/components/SchoolContactsField";
 
 type Props = { params: Promise<{ schoolSlug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { schoolSlug } = await params;
-  const school = getSchoolBySlug(schoolSlug);
+  const school = await getSchoolBySlug(schoolSlug);
   return {
     title: school
       ? `Edit ${school.name} – Flight School Finder`
@@ -32,12 +32,14 @@ const fleetRanges = ["1-3", "3-6", "6-9", "10-20", "20-30", "30-40", "40-50", "5
 
 export default async function EditSchoolPage({ params }: Props) {
   const { schoolSlug } = await params;
-  const school = getSchoolBySlug(schoolSlug);
+  const school = await getSchoolBySlug(schoolSlug);
   if (!school) notFound();
 
-  const city = getCityBySlug(school.citySlug);
-  const state = getStateBySlug(school.stateSlug);
-  const sortedPrograms = [...programs].sort((a, b) => a.sortOrder - b.sortOrder);
+  const [city, state, sortedPrograms] = await Promise.all([
+    getCityBySlug(school.citySlug),
+    getStateBySlug(school.stateSlug),
+    getPrograms(),
+  ]);
 
   return (
     <div className="pb-20">

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Plane, ChevronRight } from "lucide-react";
-import { trainerAircraft } from "@/lib/mock-data";
+import { getTrainerAircraft } from "@/lib/data";
 import type { AircraftCategory } from "@/lib/types";
 import { Suspense } from "react";
 import AircraftFilterBar from "@/components/AircraftFilterBar";
@@ -36,16 +36,6 @@ const categoryOrder: AircraftCategory[] = [
   "glider",
 ];
 
-const sorted = [...trainerAircraft].sort((a, b) => a.sortOrder - b.sortOrder);
-
-const grouped = categoryOrder
-  .map((cat) => ({
-    category: cat,
-    label: categoryLabels[cat],
-    aircraft: sorted.filter((a) => a.category === cat),
-  }))
-  .filter((g) => g.aircraft.length > 0);
-
 export default async function AircraftPage({
   searchParams,
 }: {
@@ -53,6 +43,15 @@ export default async function AircraftPage({
 }) {
   const { category } = await searchParams;
   const activeCategory = category as AircraftCategory | undefined;
+
+  const sorted = await getTrainerAircraft();
+  const grouped = categoryOrder
+    .map((cat) => ({
+      category: cat,
+      label: categoryLabels[cat],
+      aircraft: sorted.filter((a) => a.category === cat),
+    }))
+    .filter((g) => g.aircraft.length > 0);
 
   const visibleGroups = activeCategory
     ? grouped.filter((g) => g.category === activeCategory)

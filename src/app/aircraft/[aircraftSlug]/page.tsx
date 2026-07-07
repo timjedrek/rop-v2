@@ -3,14 +3,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft, Plane } from "lucide-react";
 import {
-  trainerAircraft,
   getAircraftBySlug,
   getSchoolsByAircraftSlug,
-  getProgramBySlug,
-  getCityBySlug,
-  getStateBySlug,
-  getAirportByCode,
-} from "@/lib/mock-data";
+  getProgramsBySlugs,
+  getLocationMaps,
+  getAirports,
+} from "@/lib/data";
 import type { AircraftCategory } from "@/lib/types";
 import { SchoolsExplorer } from "@/components/SchoolsExplorer";
 import { schoolHref } from "@/lib/utils";
@@ -27,7 +25,7 @@ const categoryLabels: Record<AircraftCategory, string> = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { aircraftSlug } = await params;
-  const aircraft = getAircraftBySlug(aircraftSlug);
+  const aircraft = await getAircraftBySlug(aircraftSlug);
   if (!aircraft) return { title: "Aircraft Not Found" };
 
   const title = `${aircraft.displayName} – Flight Training Aircraft`;
@@ -41,33 +39,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export function generateStaticParams() {
-  return trainerAircraft.map((a) => ({ aircraftSlug: a.slug }));
-}
-
 export default async function AircraftDetailPage({ params }: Props) {
   const { aircraftSlug } = await params;
-  const aircraft = getAircraftBySlug(aircraftSlug);
+  const aircraft = await getAircraftBySlug(aircraftSlug);
   if (!aircraft) notFound();
 
-  const rawSchools = getSchoolsByAircraftSlug(aircraft.slug);
+  const [rawSchools, { cityNameBySlug, stateBySlug }, airports, commonUsePrograms] =
+    await Promise.all([
+      getSchoolsByAircraftSlug(aircraft.slug),
+      getLocationMaps(),
+      getAirports(),
+      getProgramsBySlugs(aircraft.commonUse),
+    ]);
+  const airportNameByIcao = Object.fromEntries(
+    airports.map((a) => [a.icao, a.name]),
+  );
+
   const schools = rawSchools.map((school) => {
-    const city = getCityBySlug(school.citySlug);
-    const state = getStateBySlug(school.stateSlug);
-    const airport = getAirportByCode(school.primaryAirportCode);
+    const cityName = cityNameBySlug[school.citySlug];
+    const state = stateBySlug[school.stateSlug];
     return {
       id: school.id,
       name: school.name,
       href: schoolHref(school),
       airportCode: school.primaryAirportCode,
-      airportName: airport?.name,
-      location: city && state ? `${city.name}, ${state.abbreviation}` : undefined,
+      airportName: airportNameByIcao[school.primaryAirportCode],
+      location: cityName && state ? `${cityName}, ${state.abbreviation}` : undefined,
       rating: school.rating,
     };
   });
-  const commonUsePrograms = aircraft.commonUse
-    .map((slug) => getProgramBySlug(slug))
-    .filter(Boolean);
 
   return (
     <div className="pb-20">

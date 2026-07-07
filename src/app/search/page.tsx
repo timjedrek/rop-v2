@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { flightSchools, programs, trainerAircraft, states, cities } from "@/lib/mock-data";
+import {
+  getFlightSchools,
+  getPrograms,
+  getTrainerAircraft,
+  getStates,
+  getCities,
+} from "@/lib/data";
 import { schoolHref, slugToTitle } from "@/lib/utils";
 import { AdvancedSearchExplorer } from "@/components/AdvancedSearchExplorer";
 
@@ -15,10 +21,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SearchPage() {
+export default async function SearchPage() {
+  const [flightSchools, programs, trainerAircraft, states, cities] =
+    await Promise.all([
+      getFlightSchools(),
+      getPrograms(),
+      getTrainerAircraft(),
+      getStates(),
+      getCities(),
+    ]);
+
   const stateAbbrevMap = Object.fromEntries(
     states.map((s) => [s.slug, s.abbreviation])
   );
+  const cityNameMap = Object.fromEntries(cities.map((c) => [c.slug, c.name]));
 
   const schoolData = flightSchools.map((school) => ({
     id: school.id,
@@ -32,16 +48,18 @@ export default function SearchPage() {
     faaPart: school.faaPart,
     rating: school.rating,
     reviewCount: school.reviewCount,
-    location: `${slugToTitle(school.citySlug)}, ${stateAbbrevMap[school.stateSlug] ?? school.stateSlug.toUpperCase()}`,
+    location: `${cityNameMap[school.citySlug] ?? slugToTitle(school.citySlug)}, ${stateAbbrevMap[school.stateSlug] ?? school.stateSlug.toUpperCase()}`,
   }));
 
-  const programOptions = [...programs]
-    .sort((a, b) => a.sortOrder - b.sortOrder)
-    .map((p) => ({ slug: p.slug, shortName: p.shortName }));
+  const programOptions = programs.map((p) => ({
+    slug: p.slug,
+    shortName: p.shortName,
+  }));
 
-  const aircraftOptions = [...trainerAircraft]
-    .sort((a, b) => a.sortOrder - b.sortOrder)
-    .map((a) => ({ slug: a.slug, displayName: a.displayName }));
+  const aircraftOptions = trainerAircraft.map((a) => ({
+    slug: a.slug,
+    displayName: a.displayName,
+  }));
 
   const stateOptions = states.map((s) => ({
     slug: s.slug,
@@ -49,14 +67,12 @@ export default function SearchPage() {
     abbreviation: s.abbreviation,
   }));
 
-  const cityOptions = [...cities]
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map((c) => ({
-      slug: c.slug,
-      name: c.name,
-      stateSlug: c.stateSlug,
-      stateAbbreviation: c.stateAbbreviation,
-    }));
+  const cityOptions = cities.map((c) => ({
+    slug: c.slug,
+    name: c.name,
+    stateSlug: c.stateSlug,
+    stateAbbreviation: c.stateAbbreviation,
+  }));
 
   return (
     <Suspense>

@@ -1,13 +1,13 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Pencil } from "lucide-react";
-import { getAirportByCode, getCityBySlug, getStateBySlug } from "@/lib/mock-data";
+import { getAirportByCode, getCityBySlug, getStateBySlug } from "@/lib/data";
 
 type Props = { params: Promise<{ airportCode: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { airportCode } = await params;
-  const airport = getAirportByCode(airportCode);
+  const airport = await getAirportByCode(airportCode);
   return {
     title: airport
       ? `Edit ${airport.icao} – ${airport.name} – Flight School Finder`
@@ -24,11 +24,13 @@ const sectionClass =
 
 export default async function EditAirportPage({ params }: Props) {
   const { airportCode } = await params;
-  const airport = getAirportByCode(airportCode);
+  const airport = await getAirportByCode(airportCode);
   if (!airport) notFound();
 
-  const city = getCityBySlug(airport.citySlug);
-  const state = getStateBySlug(airport.stateSlug);
+  const [city, state] = await Promise.all([
+    getCityBySlug(airport.citySlug),
+    getStateBySlug(airport.stateSlug),
+  ]);
 
   return (
     <div className="pb-20">

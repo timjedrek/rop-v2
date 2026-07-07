@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { airports, cities, states, flightSchools } from "@/lib/mock-data";
+import { getAirportsWithSchoolCounts, getLocationMaps } from "@/lib/data";
 import { AirportsExplorer, type AirportRow } from "@/components/AirportsExplorer";
 
 export const metadata: Metadata = {
@@ -21,25 +21,26 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AirportsPage() {
-  const rows: AirportRow[] = airports.map((airport) => {
-    const city = cities.find((c) => c.slug === airport.citySlug);
-    const state = states.find((s) => s.slug === airport.stateSlug);
-    return {
-      id: airport.id,
-      name: airport.name,
-      icao: airport.icao,
-      iata: airport.iata,
-      faaLid: airport.faaLid,
-      citySlug: airport.citySlug,
-      cityName: city?.name ?? airport.citySlug,
-      stateSlug: airport.stateSlug,
-      stateAbbreviation: state?.abbreviation ?? airport.stateSlug.toUpperCase().slice(0, 2),
-      schoolCount: flightSchools.filter(
-        (s) => s.primaryAirportCode === airport.icao,
-      ).length,
-    };
-  });
+export default async function AirportsPage() {
+  const [airports, { cityNameBySlug, stateBySlug }] = await Promise.all([
+    getAirportsWithSchoolCounts(),
+    getLocationMaps(),
+  ]);
+
+  const rows: AirportRow[] = airports.map((airport) => ({
+    id: airport.id,
+    name: airport.name,
+    icao: airport.icao,
+    iata: airport.iata,
+    faaLid: airport.faaLid,
+    citySlug: airport.citySlug,
+    cityName: cityNameBySlug[airport.citySlug] ?? airport.citySlug,
+    stateSlug: airport.stateSlug,
+    stateAbbreviation:
+      stateBySlug[airport.stateSlug]?.abbreviation ??
+      airport.stateSlug.toUpperCase().slice(0, 2),
+    schoolCount: airport.schoolCount,
+  }));
 
   return <AirportsExplorer airports={rows} />;
 }

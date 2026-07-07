@@ -3,23 +3,25 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Plane, MapPin, Building2, ChevronLeft } from "lucide-react";
 import {
-  cities,
   getCityBySlug,
+  getCitiesBySlugs,
   getAirportsByCity,
   getSchoolsByCity,
   getStateBySlug,
-} from "@/lib/mock-data";
+} from "@/lib/data";
 import { SchoolCard } from "@/components/SchoolCard";
 
 type Props = { params: Promise<{ citySlug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { citySlug } = await params;
-  const city = getCityBySlug(citySlug);
+  const city = await getCityBySlug(citySlug);
   if (!city) return { title: "City Not Found" };
-  const state = getStateBySlug(city.stateSlug);
-  const schools = getSchoolsByCity(citySlug);
-  const airports = getAirportsByCity(citySlug);
+  const [state, schools, airports] = await Promise.all([
+    getStateBySlug(city.stateSlug),
+    getSchoolsByCity(citySlug),
+    getAirportsByCity(citySlug),
+  ]);
   const title = `Flight Schools in ${city.name}, ${city.stateAbbreviation}`;
   const description = `Find flight schools in ${city.name}, ${state?.name ?? city.stateAbbreviation}. Browse ${schools.length} schools across ${airports.length} airports.`;
   return {
@@ -31,23 +33,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export function generateStaticParams() {
-  return cities.map((c) => ({ citySlug: c.slug }));
-}
-
 export default async function CityDetailPage({ params }: Props) {
   const { citySlug } = await params;
-  const city = getCityBySlug(citySlug);
+  const city = await getCityBySlug(citySlug);
   if (!city) notFound();
 
-  const state = getStateBySlug(city.stateSlug);
-  const cityAirports = getAirportsByCity(citySlug);
-  const citySchools = getSchoolsByCity(citySlug);
-
   // Resolve nearby city objects (metro area, can cross state lines)
-  const nearbyCities = city.nearbyCitySlugs
-    .map((slug) => getCityBySlug(slug))
-    .filter((c): c is NonNullable<typeof c> => c !== undefined);
+  const [state, cityAirports, citySchools, nearbyCities] = await Promise.all([
+    getStateBySlug(city.stateSlug),
+    getAirportsByCity(citySlug),
+    getSchoolsByCity(citySlug),
+    getCitiesBySlugs(city.nearbyCitySlugs),
+  ]);
 
   const itemListJsonLd = {
     "@context": "https://schema.org",
@@ -178,10 +175,8 @@ export default async function CityDetailPage({ params }: Props) {
           {citySchools.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {citySchools.map((school) => {
-                const schoolCity = getCityBySlug(school.citySlug);
-                const schoolState = getStateBySlug(school.stateSlug);
-                const locationLabel = schoolCity && schoolState
-                  ? `${schoolCity.name}, ${schoolState.abbreviation}`
+                const locationLabel = state
+                  ? `${city.name}, ${state.abbreviation}`
                   : city.name;
                 return (
                   <SchoolCard

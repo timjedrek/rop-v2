@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Star } from "lucide-react";
-import { getTopRatedSchools, getCityBySlug, getStateBySlug } from "@/lib/mock-data";
+import { getTopRatedSchools, getLocationMaps } from "@/lib/data";
 import { schoolHref } from "@/lib/utils";
 import { TopRatedExplorer } from "@/components/TopRatedExplorer";
 
@@ -23,13 +23,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function TopRatedPage() {
-  const schools = getTopRatedSchools().map((school) => {
-    const city = getCityBySlug(school.citySlug);
-    const state = getStateBySlug(school.stateSlug);
+export default async function TopRatedPage() {
+  const [topRated, { cityNameBySlug, stateBySlug }] = await Promise.all([
+    getTopRatedSchools(),
+    getLocationMaps(),
+  ]);
+  const schools = topRated.map((school) => {
+    const cityName = cityNameBySlug[school.citySlug];
+    const state = stateBySlug[school.stateSlug];
     return {
       ...school,
-      location: city && state ? `${city.name}, ${state.abbreviation}` : school.citySlug,
+      location: cityName && state ? `${cityName}, ${state.abbreviation}` : school.citySlug,
       href: schoolHref(school),
     };
   });

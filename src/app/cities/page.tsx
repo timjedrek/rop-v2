@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { cities, airports, flightSchools } from "@/lib/mock-data";
+import { getCitiesWithCounts } from "@/lib/data";
 import { CitiesExplorer, type CityRow } from "@/components/CitiesExplorer";
 
 export const metadata: Metadata = {
@@ -21,15 +21,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CitiesPage() {
+export default async function CitiesPage() {
+  const cities = await getCitiesWithCounts();
   const rows: CityRow[] = cities.map((city) => ({
     id: city.id,
     name: city.name,
     slug: city.slug,
     stateSlug: city.stateSlug,
     stateAbbreviation: city.stateAbbreviation,
-    schoolCount: flightSchools.filter((s) => s.citySlug === city.slug).length,
-    airportCount: airports.filter((a) => a.citySlug === city.slug).length,
+    schoolCount: city.schoolCount,
+    airportCount: city.airportCount,
   }));
 
   return <CitiesExplorer cities={rows} />;

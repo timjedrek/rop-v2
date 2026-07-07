@@ -3,23 +3,25 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Plane, ChevronLeft } from "lucide-react";
 import {
-  airports,
   getAirportByCode,
   getCityBySlug,
   getStateBySlug,
   getSchoolsByAirport,
-} from "@/lib/mock-data";
+  getLocationMaps,
+} from "@/lib/data";
 import { SchoolCard } from "@/components/SchoolCard";
 
 type Props = { params: Promise<{ airportCode: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { airportCode } = await params;
-  const airport = getAirportByCode(airportCode);
+  const airport = await getAirportByCode(airportCode);
   if (!airport) return { title: "Airport Not Found" };
-  const city = getCityBySlug(airport.citySlug);
-  const state = getStateBySlug(airport.stateSlug);
-  const schools = getSchoolsByAirport(airport.icao);
+  const [city, state, schools] = await Promise.all([
+    getCityBySlug(airport.citySlug),
+    getStateBySlug(airport.stateSlug),
+    getSchoolsByAirport(airport.icao),
+  ]);
   const fallbackDesc = `Find ${schools.length} flight school${schools.length !== 1 ? "s" : ""} at ${airport.name} (${airport.icao}) in ${city?.name ?? ""}, ${state?.name ?? ""}.`;
   const description = airport.description
     ? airport.description.slice(0, 160)
@@ -34,18 +36,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export function generateStaticParams() {
-  return airports.map((a) => ({ airportCode: a.icao.toLowerCase() }));
-}
-
 export default async function AirportDetailPage({ params }: Props) {
   const { airportCode } = await params;
-  const airport = getAirportByCode(airportCode);
+  const airport = await getAirportByCode(airportCode);
   if (!airport) notFound();
 
-  const city = getCityBySlug(airport.citySlug);
-  const state = getStateBySlug(airport.stateSlug);
-  const schools = getSchoolsByAirport(airport.icao);
+  const [city, state, schools, { cityNameBySlug, stateBySlug }] =
+    await Promise.all([
+      getCityBySlug(airport.citySlug),
+      getStateBySlug(airport.stateSlug),
+      getSchoolsByAirport(airport.icao),
+      getLocationMaps(),
+    ]);
 
   const itemListJsonLd = {
     "@context": "https://schema.org",
@@ -141,15 +143,15 @@ export default async function AirportDetailPage({ params }: Props) {
           {schools.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {schools.map((school) => {
-                const schoolCity = getCityBySlug(school.citySlug);
-                const schoolState = getStateBySlug(school.stateSlug);
+                const cityName = cityNameBySlug[school.citySlug];
+                const schoolState = stateBySlug[school.stateSlug];
                 return (
                   <SchoolCard
                     key={school.id}
                     name={school.name}
                     location={
-                      schoolCity && schoolState
-                        ? `${schoolCity.name}, ${schoolState.abbreviation}`
+                      cityName && schoolState
+                        ? `${cityName}, ${schoolState.abbreviation}`
                         : school.citySlug
                     }
                     rating={school.rating}

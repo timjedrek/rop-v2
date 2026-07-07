@@ -3,20 +3,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Plane, MapPin, Building2, ChevronLeft } from "lucide-react";
 import {
-  states,
   getStateBySlug,
   getCitiesByState,
   getAirportsByState,
   getSchoolsByState,
-  getCityBySlug,
-} from "@/lib/mock-data";
+} from "@/lib/data";
 import { SchoolCard } from "@/components/SchoolCard";
 
 type Props = { params: Promise<{ stateSlug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { stateSlug } = await params;
-  const state = getStateBySlug(stateSlug);
+  const state = await getStateBySlug(stateSlug);
   if (!state) return { title: "State Not Found" };
   const title = `Flight Schools in ${state.name}`;
   const description = `Find flight schools in ${state.name}. Browse ${state.schoolCount} schools across ${state.airportCount} airports.`;
@@ -29,18 +27,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export function generateStaticParams() {
-  return states.map((s) => ({ stateSlug: s.slug }));
-}
-
 export default async function StateDetailPage({ params }: Props) {
   const { stateSlug } = await params;
-  const state = getStateBySlug(stateSlug);
+  const state = await getStateBySlug(stateSlug);
   if (!state) notFound();
 
-  const stateCities = getCitiesByState(stateSlug);
-  const stateAirports = getAirportsByState(stateSlug);
-  const stateSchools = getSchoolsByState(stateSlug);
+  const [stateCities, stateAirports, stateSchools] = await Promise.all([
+    getCitiesByState(stateSlug),
+    getAirportsByState(stateSlug),
+    getSchoolsByState(stateSlug),
+  ]);
+  const cityNameBySlug = Object.fromEntries(
+    stateCities.map((c) => [c.slug, c.name]),
+  );
 
   const itemListJsonLd = {
     "@context": "https://schema.org",
@@ -170,8 +169,7 @@ export default async function StateDetailPage({ params }: Props) {
           {stateSchools.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {stateSchools.map((school) => {
-                const city = getCityBySlug(school.citySlug);
-                const cityName = city?.name ?? school.citySlug;
+                const cityName = cityNameBySlug[school.citySlug] ?? school.citySlug;
                 return (
                   <SchoolCard
                     key={school.id}

@@ -3,10 +3,9 @@ import Link from "next/link";
 import { SchoolCard } from "@/components/SchoolCard";
 import {
   getFeaturedSchools,
-  getCityBySlug,
-  getStateBySlug,
-  programs,
-} from "@/lib/mock-data";
+  getProgramsBySlugs,
+  getSearchIndex,
+} from "@/lib/data";
 import { schoolHref } from "@/lib/utils";
 import { HeroSearch } from "@/components/HeroSearch";
 
@@ -28,8 +27,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
-  const featuredSchools = getFeaturedSchools();
+export default async function Home() {
+  const [featuredSchools, searchIndex, offeredPrograms] = await Promise.all([
+    getFeaturedSchools(),
+    getSearchIndex(),
+    getProgramsBySlugs([
+      "private-pilot",
+      "instrument-rating",
+      "commercial-pilot",
+      "cfi",
+    ]),
+  ]);
+  const locationById = Object.fromEntries(
+    searchIndex.schools.map((s) => [s.id, s.location]),
+  );
 
   return (
     <div className="pb-20">
@@ -45,7 +56,10 @@ export default function Home() {
             ratings, programs, and contact info.
           </p>
 
-          <HeroSearch />
+          <HeroSearch
+            schools={searchIndex.schools}
+            airports={searchIndex.airports}
+          />
         </div>
       </section>
 
@@ -64,24 +78,16 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredSchools.map((school) => {
-            const city = getCityBySlug(school.citySlug);
-            const state = getStateBySlug(school.stateSlug);
-            const location =
-              city && state
-                ? `${city.name}, ${state.abbreviation}`
-                : school.citySlug;
-            return (
-              <SchoolCard
-                key={school.id}
-                name={school.name}
-                location={location}
-                rating={school.rating}
-                reviewCount={school.reviewCount}
-                href={schoolHref(school)}
-              />
-            );
-          })}
+          {featuredSchools.map((school) => (
+            <SchoolCard
+              key={school.id}
+              name={school.name}
+              location={locationById[school.id] ?? school.citySlug}
+              rating={school.rating}
+              reviewCount={school.reviewCount}
+              href={schoolHref(school)}
+            />
+          ))}
         </div>
       </section>
       {/* Why Create an Account */}
@@ -183,9 +189,7 @@ export default function Home() {
             and ratings.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {["private-pilot", "instrument-rating", "commercial-pilot", "cfi"]
-              .map((slug) => programs.find((p) => p.slug === slug)!)
-              .map((program) => (
+            {offeredPrograms.map((program) => (
                 <Link
                   key={program.id}
                   href={`/programs/${program.slug}`}
