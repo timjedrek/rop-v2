@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { AuthButton } from "@/components/AuthButton";
 import { navLinks } from "@/lib/nav-links";
 
 export function Navbar() {
@@ -69,12 +70,7 @@ export function Navbar() {
                 </a>
               ),
             )}
-            <Link
-              href="/login"
-              className="bg-rose-700 text-white px-4 py-2 rounded-lg font-medium hover:bg-rose-600 transition-colors shadow-sm"
-            >
-              Log In
-            </Link>
+            <AuthButton />
             <ThemeToggle />
           </nav>
 
@@ -112,12 +108,7 @@ export function Navbar() {
             </a>
           ))}
           <div className="px-5 py-3">
-            <Link
-              href="/login"
-              className="block w-full bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 text-sm font-medium transition-colors text-center"
-            >
-              Log In
-            </Link>
+            <AuthButton mobile />
           </div>
         </nav>
       </div>
