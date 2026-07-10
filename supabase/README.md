@@ -33,6 +33,8 @@ fresh installs):
 
 - `supabase/add-school-submissions.sql` — "Add a School" submissions table
 - `supabase/add-admin-policies.sql` — admin RLS policies + owner-policy hardening
+- `supabase/add-one-review-per-user.sql` — one review per user per school
+  (de-dupes keeping the newest, unique index, drops owner review edits)
 
 Users, reviews, and comments are not seeded — they come from real signups.
 
